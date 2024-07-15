@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.wgz.shortlink.admin.common.convention.exception.ClientException;
+import org.wgz.shortlink.admin.common.enums.UserErrorCode;
 import org.wgz.shortlink.admin.dao.entity.UserDO;
 import org.wgz.shortlink.admin.dao.mapper.UserMapper;
 import org.wgz.shortlink.admin.dto.resp.UserRespDTO;
@@ -24,6 +26,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
         LambdaQueryWrapper<UserDO> queryWrapper = Wrappers.lambdaQuery(UserDO.class)
                 .eq(UserDO::getUsername, username);
         UserDO userDO = baseMapper.selectOne(queryWrapper);
+        if(userDO == null){
+            throw new ClientException(UserErrorCode.USER_NULL);
+        }
         UserRespDTO result = new UserRespDTO();
         BeanUtils.copyProperties(userDO, result);
         return result;
