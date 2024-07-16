@@ -1,14 +1,12 @@
 package org.wgz.shortlink.admin.dto.resp;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
-import org.wgz.shortlink.admin.common.serialize.PhoneDesensitizationSerializer;
 
 /**
  * 用户返回参数响应
  */
 @Data
-public class UserRespDTO {
+public class UserRespActualDTO {
     /**
      * ID
      */
@@ -27,7 +25,6 @@ public class UserRespDTO {
     /**
      * 手机号
      */
-    @JsonSerialize(using = PhoneDesensitizationSerializer.class)
     private String phone;
 
     /**
