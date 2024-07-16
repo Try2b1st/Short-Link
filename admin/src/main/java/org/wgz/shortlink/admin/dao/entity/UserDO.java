@@ -1,17 +1,19 @@
 package org.wgz.shortlink.admin.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 
- * @TableName t_user
+ * &#064;TableName  t_user
  */
-@TableName(value ="t_user")
+@TableName(value = "t_user")
 @Data
 public class UserDO implements Serializable {
     /**
@@ -52,18 +54,23 @@ public class UserDO implements Serializable {
     /**
      * 创建时间
      */
+    @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
     /**
      * 修改时间
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
     /**
      * 删除标识 0：未删除 1：已删除
      */
+    @TableLogic
+    @TableField(value = "del_flag")
     private Integer delFlag;
 
+    @Serial
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
@@ -80,15 +87,15 @@ public class UserDO implements Serializable {
         }
         UserDO other = (UserDO) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getUsername() == null ? other.getUsername() == null : this.getUsername().equals(other.getUsername()))
-            && (this.getPassword() == null ? other.getPassword() == null : this.getPassword().equals(other.getPassword()))
-            && (this.getRealName() == null ? other.getRealName() == null : this.getRealName().equals(other.getRealName()))
-            && (this.getPhone() == null ? other.getPhone() == null : this.getPhone().equals(other.getPhone()))
-            && (this.getMail() == null ? other.getMail() == null : this.getMail().equals(other.getMail()))
-            && (this.getDeletionTime() == null ? other.getDeletionTime() == null : this.getDeletionTime().equals(other.getDeletionTime()))
-            && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
-            && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
-            && (this.getDelFlag() == null ? other.getDelFlag() == null : this.getDelFlag().equals(other.getDelFlag()));
+                && (this.getUsername() == null ? other.getUsername() == null : this.getUsername().equals(other.getUsername()))
+                && (this.getPassword() == null ? other.getPassword() == null : this.getPassword().equals(other.getPassword()))
+                && (this.getRealName() == null ? other.getRealName() == null : this.getRealName().equals(other.getRealName()))
+                && (this.getPhone() == null ? other.getPhone() == null : this.getPhone().equals(other.getPhone()))
+                && (this.getMail() == null ? other.getMail() == null : this.getMail().equals(other.getMail()))
+                && (this.getDeletionTime() == null ? other.getDeletionTime() == null : this.getDeletionTime().equals(other.getDeletionTime()))
+                && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
+                && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
+                && (this.getDelFlag() == null ? other.getDelFlag() == null : this.getDelFlag().equals(other.getDelFlag()));
     }
 
     @Override
