@@ -2,11 +2,13 @@ package org.wgz.shortlink.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.wgz.shortlink.admin.common.biz.user.UserContext;
 import org.wgz.shortlink.admin.dao.entity.GroupDO;
+import org.wgz.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.wgz.shortlink.admin.dto.resp.ShortLinkGroupListRespDTO;
 import org.wgz.shortlink.admin.service.GroupService;
 import org.wgz.shortlink.admin.dao.mapper.GroupMapper;
@@ -49,6 +51,16 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO>
         List<GroupDO> groupDOS = baseMapper.selectList(queryWrapper);
 
         return BeanUtil.copyToList(groupDOS, ShortLinkGroupListRespDTO.class);
+    }
+
+    @Override
+    public void updateGroup(ShortLinkGroupUpdateReqDTO shortLinkGroupUpdateReqDTO) {
+        LambdaUpdateWrapper<GroupDO> updateWrapper = Wrappers.lambdaUpdate(GroupDO.class)
+                .eq(GroupDO::getUsername, UserContext.getUsername())
+                .eq(GroupDO::getGid, shortLinkGroupUpdateReqDTO.getGid());
+        GroupDO groupDO = new GroupDO();
+        groupDO.setName(shortLinkGroupUpdateReqDTO.getName());
+        baseMapper.update(groupDO, updateWrapper);
     }
 
     private Boolean hasGid(String gid) {
