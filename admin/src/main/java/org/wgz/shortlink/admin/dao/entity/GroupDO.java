@@ -1,7 +1,10 @@
 package org.wgz.shortlink.admin.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -12,6 +15,9 @@ import java.util.Date;
  */
 @TableName(value ="t_group")
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class GroupDO implements Serializable {
     /**
      * ID
