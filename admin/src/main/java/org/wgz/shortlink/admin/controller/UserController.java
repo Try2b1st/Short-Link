@@ -56,6 +56,9 @@ public class UserController {
         return Results.success();
     }
 
+    /**
+     * 修改用户信息
+     */
     @PutMapping("/api/shortLink/v1/user")
     public Result<Void> update(@RequestBody UserUpdateReqDTO userUpdateReqDTO) {
         userService.update(userUpdateReqDTO);

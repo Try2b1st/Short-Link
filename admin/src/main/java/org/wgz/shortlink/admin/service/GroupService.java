@@ -1,7 +1,10 @@
 package org.wgz.shortlink.admin.service;
 
-import org.wgz.shortlink.admin.dao.entity.GroupDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.wgz.shortlink.admin.dao.entity.GroupDO;
+import org.wgz.shortlink.admin.dto.resp.ShortLinkGroupListRespDTO;
+
+import java.util.List;
 
 /**
 * @author 下水道的小老鼠
@@ -10,5 +13,15 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface GroupService extends IService<GroupDO> {
 
+    /**
+     * 新增短链接分组
+     *
+     * @param groupName 分组名称
+     */
     void saveGroup(String groupName);
+
+    /**
+     * 获取短链接分组列表
+     */
+    List<ShortLinkGroupListRespDTO> groupList();
 }

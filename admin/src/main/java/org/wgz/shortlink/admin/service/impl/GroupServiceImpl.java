@@ -1,14 +1,19 @@
 package org.wgz.shortlink.admin.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.wgz.shortlink.admin.common.biz.user.UserContext;
 import org.wgz.shortlink.admin.dao.entity.GroupDO;
+import org.wgz.shortlink.admin.dto.resp.ShortLinkGroupListRespDTO;
 import org.wgz.shortlink.admin.service.GroupService;
 import org.wgz.shortlink.admin.dao.mapper.GroupMapper;
 import org.springframework.stereotype.Service;
 import org.wgz.shortlink.admin.util.RandomStringGenerator;
+
+import java.util.List;
 
 /**
  * @author 下水道的小老鼠
@@ -25,20 +30,31 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO>
         String gid;
         do {
             gid = RandomStringGenerator.generateRandomString();
-        } while (!hasGid(gid));
+        } while (hasGid(gid));
         GroupDO groupDO = GroupDO.builder()
                 .gid(gid)
                 .name(groupName)
-                // TODO 设置用户名
-                .username("wgzwgz")
+                .sortOrder(0)
+                .username(UserContext.getUsername())
                 .build();
+        baseMapper.insert(groupDO);
+    }
+
+    @Override
+    public List<ShortLinkGroupListRespDTO> groupList() {
+        LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
+                .eq(GroupDO::getUsername, UserContext.getUsername())
+                .orderByDesc(GroupDO::getSortOrder)
+                .orderByDesc(GroupDO::getUpdateTime);
+        List<GroupDO> groupDOS = baseMapper.selectList(queryWrapper);
+
+        return BeanUtil.copyToList(groupDOS, ShortLinkGroupListRespDTO.class);
     }
 
     private Boolean hasGid(String gid) {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getGid, gid)
-                // TODO 设置用户名
-                .eq(GroupDO::getUsername, "wgzwgz");
+                .eq(GroupDO::getUsername, UserContext.getUsername());
         GroupDO hasGroup = baseMapper.selectOne(queryWrapper);
         return hasGroup != null;
     }
