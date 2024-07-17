@@ -5,7 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.wgz.shortlink.admin.common.convention.result.Result;
 import org.wgz.shortlink.admin.common.convention.result.Results;
+import org.wgz.shortlink.admin.dto.req.UserLoginReqDTO;
 import org.wgz.shortlink.admin.dto.req.UserRegisterReqDTO;
+import org.wgz.shortlink.admin.dto.req.UserUpdateReqDTO;
+import org.wgz.shortlink.admin.dto.resp.UserLoginRespDTO;
 import org.wgz.shortlink.admin.dto.resp.UserRespActualDTO;
 import org.wgz.shortlink.admin.dto.resp.UserRespDTO;
 import org.wgz.shortlink.admin.service.UserService;
@@ -50,6 +53,32 @@ public class UserController {
     @PostMapping("/api/shortLink/v1/user")
     public Result<Void> register(@RequestBody UserRegisterReqDTO userRegisterReqDTO) {
         userService.register(userRegisterReqDTO);
+        return Results.success();
+    }
+
+    @PutMapping("/api/shortLink/v1/user")
+    public Result<Void> update(@RequestBody UserUpdateReqDTO userUpdateReqDTO) {
+        userService.update(userUpdateReqDTO);
+        return Results.success();
+    }
+
+    @PostMapping("/api/shortLink/v1/user/login")
+    public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO userLoginReqDTO) {
+        return Results.success(userService.login(userLoginReqDTO));
+    }
+
+
+    @GetMapping("/api/shortLink/v1/user/check-login")
+    public Result<Boolean> checkLogin(@RequestParam("username") String username,
+                                      @RequestParam("token") String token) {
+        return Results.success(userService.checkLogin(username, token));
+    }
+
+
+    @DeleteMapping("/api/shortLink/v1/user/logout")
+    public Result<Void> logout(@RequestParam("username") String username,
+                               @RequestParam("token") String token) {
+        userService.logout(username, token);
         return Results.success();
     }
 }
