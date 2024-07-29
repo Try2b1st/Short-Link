@@ -2,6 +2,7 @@ package org.wgz.shortlink.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.wgz.shortlink.admin.dao.entity.GroupDO;
+import org.wgz.shortlink.admin.dto.req.ShortLinkGroupSortReqDTO;
 import org.wgz.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.wgz.shortlink.admin.dto.resp.ShortLinkGroupListRespDTO;
 
@@ -34,4 +35,6 @@ public interface GroupService extends IService<GroupDO> {
     void updateGroup(ShortLinkGroupUpdateReqDTO shortLinkGroupUpdateReqDTO);
 
     void deleteGroup(String gid);
+
+    void sortGroup(List<ShortLinkGroupSortReqDTO> shortLinkGroupSortReqDTOS);
 }
