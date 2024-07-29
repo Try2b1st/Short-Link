@@ -63,6 +63,14 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO>
         baseMapper.update(groupDO, updateWrapper);
     }
 
+    @Override
+    public void deleteGroup(String gid) {
+        LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
+                .eq(GroupDO::getGid, gid)
+                .eq(GroupDO::getDelFlag, 0);
+        baseMapper.delete(queryWrapper);
+    }
+
     private Boolean hasGid(String gid) {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getGid, gid)
