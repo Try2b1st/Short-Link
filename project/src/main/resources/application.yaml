@@ -3,14 +3,18 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/short_link?characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=GMT%2B8
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: 1234
+    # ShardingSphere 对 Driver 自定义，实现分库分表等隐藏逻辑
+    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+    # ShardingSphere 配置文件路径
+    url: jdbc:shardingsphere:classpath:shardingsphere-config.yaml
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
 
-    hikari:
-      connection-test-query: select 1
-      connection-timeout: 20000
-      idle-timeout: 300000
-      maximum-pool-size: 5
-      minimum-idle: 5
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: del_flag # 全局逻辑删除的实体字段名
+      logic-delete-value: 1 # 逻辑已删除值（默认为 1）
+      logic-not-delete-value: 0 # 逻辑未删除值（默认为 0）
