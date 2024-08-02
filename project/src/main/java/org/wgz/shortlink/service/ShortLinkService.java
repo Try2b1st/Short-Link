@@ -2,6 +2,8 @@ package org.wgz.shortlink.service;
 
 import org.wgz.shortlink.dao.entity.ShortLinkDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.wgz.shortlink.dto.req.ShortLinkCreateReqDTO;
+import org.wgz.shortlink.dto.resp.ShortLinkCreateRespDTO;
 
 /**
 * @author 下水道的小老鼠
@@ -9,5 +11,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2024-08-02 11:22:12
 */
 public interface ShortLinkService extends IService<ShortLinkDO> {
-
+    ShortLinkCreateRespDTO create(ShortLinkCreateReqDTO shortLinkCreateReqDTO);
 }

@@ -71,6 +71,7 @@ public class ShortLinkDO implements Serializable {
     /**
      * 描述
      */
+    @TableField("`describe`")
     private String describe;
 
     /**
