@@ -55,6 +55,11 @@ public class ShortLinkDO implements Serializable {
     private String gid;
 
     /**
+     * 网址图标
+     */
+    private String favicon;
+
+    /**
      * 启用标识 0：未启用 1：已启用
      */
     private Integer enableStatus;
@@ -83,11 +88,13 @@ public class ShortLinkDO implements Serializable {
     /**
      * 创建时间
      */
+    @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
     /**
      * 修改时间
      */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
     /**
