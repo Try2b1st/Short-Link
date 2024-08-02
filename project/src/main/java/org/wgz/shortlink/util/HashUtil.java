@@ -1,5 +1,7 @@
 package org.wgz.shortlink.util;
 
+import cn.hutool.core.lang.hash.MurmurHash;
+
 public class HashUtil {
     private static final char[] CHARS = new char[]{
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -16,5 +18,11 @@ public class HashUtil {
             num /= SIZE;
         }
         return sb.reverse().toString();
+    }
+
+    public static String hashToBase62(String str) {
+        int i = MurmurHash.hash32(str);
+        long num = i < 0 ? Integer.MAX_VALUE - (long) i : i;
+        return convertDecToBase62(num);
     }
 }

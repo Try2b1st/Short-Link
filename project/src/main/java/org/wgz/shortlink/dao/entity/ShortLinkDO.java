@@ -1,7 +1,10 @@
 package org.wgz.shortlink.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -11,6 +14,9 @@ import java.util.Date;
  */
 @TableName(value ="t_link")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ShortLinkDO implements Serializable {
     /**
      * ID
