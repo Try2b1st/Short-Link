@@ -16,8 +16,9 @@ import java.util.List;
  * 短链接分组功能
  */
 
-@RestController("/api/shortLink/admin")
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/shortLink/admin")
 public class GroupController {
 
     private final GroupService groupService;
