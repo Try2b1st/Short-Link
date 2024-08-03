@@ -38,15 +38,20 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO>
 
     @Override
     public void saveGroup(String groupName) {
+        saveGroup(UserContext.getUsername(), groupName);
+    }
+
+    @Override
+    public void saveGroup(String username, String groupName) {
         String gid;
         do {
             gid = RandomStringGenerator.generateRandomString();
-        } while (hasGid(gid));
+        } while (hasGid(username, gid));
         GroupDO groupDO = GroupDO.builder()
                 .gid(gid)
                 .name(groupName)
                 .sortOrder(0)
-                .username(UserContext.getUsername())
+                .username(username)
                 .build();
         baseMapper.insert(groupDO);
     }
@@ -60,16 +65,21 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO>
         List<GroupDO> groupDOS = baseMapper.selectList(queryWrapper);
 
         Result<List<ShortLinkGroupCountQueryRespDTO>> listResult = shortLinkRemoteService.listGroupShortLinkCount(
-          groupDOS.stream().map(GroupDO::getGid).toList()
+                groupDOS.stream().map(GroupDO::getGid).toList()
         );
 
-        List<ShortLinkGroupListRespDTO> shortLinkGroupListRespDTOList = BeanUtil.copyToList(groupDOS,ShortLinkGroupListRespDTO.class);
+        List<ShortLinkGroupListRespDTO> shortLinkGroupListRespDTOList = BeanUtil.copyToList(groupDOS, ShortLinkGroupListRespDTO.class);
 
-        shortLinkGroupListRespDTOList.forEach(each ->{
+        shortLinkGroupListRespDTOList.forEach(each -> {
             Optional<ShortLinkGroupCountQueryRespDTO> first = listResult.getData().stream()
-                    .filter(item -> Objects.equals(item.getGid(),each.getGid()))
+                    .filter(item -> Objects.equals(item.getGid(), each.getGid()))
                     .findFirst();
             first.ifPresent(item -> each.setShortLinkCount(first.get().getShortLinkCount()));
+            // TODO
+//            first.ifPresentOrElse(
+//                    item -> each.setShortLinkCount(item.getShortLinkCount()),
+//                    () -> each.setShortLinkCount(0)
+//            );
         });
         return shortLinkGroupListRespDTOList;
     }
@@ -104,10 +114,10 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO>
         });
     }
 
-    private Boolean hasGid(String gid) {
+    private Boolean hasGid(String username, String gid) {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getGid, gid)
-                .eq(GroupDO::getUsername, UserContext.getUsername());
+                .eq(GroupDO::getUsername, Optional.ofNullable(username).orElse(UserContext.getUsername()));
         GroupDO hasGroup = baseMapper.selectOne(queryWrapper);
         return hasGroup != null;
     }
