@@ -75,7 +75,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO>
                     .filter(item -> Objects.equals(item.getGid(), each.getGid()))
                     .findFirst();
             first.ifPresent(item -> each.setShortLinkCount(first.get().getShortLinkCount()));
-            // TODO
+            // TODO ShortLinkCount 为 null 时应该返回 0
 //            first.ifPresentOrElse(
 //                    item -> each.setShortLinkCount(item.getShortLinkCount()),
 //                    () -> each.setShortLinkCount(0)
