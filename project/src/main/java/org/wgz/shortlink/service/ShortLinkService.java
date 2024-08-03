@@ -6,7 +6,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.wgz.shortlink.dto.req.ShortLinkCreateReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkPageReqDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkCreateRespDTO;
+import org.wgz.shortlink.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkPageRespDTO;
+
+import java.util.List;
 
 /**
 * @author 下水道的小老鼠
@@ -30,4 +33,12 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
      * @return 响应分页数据
      */
     IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO shortLinkPageReqDTO);
+
+    /**
+     * 查询短链接分组下的短链接数目
+     *
+     * @param requestParam 分组标识集合
+     * @return 响应参数
+     */
+    List<ShortLinkGroupCountQueryRespDTO> listGroupShortLinkCount(List<String> requestParam);
 }

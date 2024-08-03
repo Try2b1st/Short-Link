@@ -3,6 +3,7 @@ package org.wgz.shortlink.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.text.StrBuilder;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,10 +18,13 @@ import org.wgz.shortlink.dao.mapper.ShortLinkMapper;
 import org.wgz.shortlink.dto.req.ShortLinkCreateReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkPageReqDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkCreateRespDTO;
+import org.wgz.shortlink.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkPageRespDTO;
 import org.wgz.shortlink.service.ShortLinkService;
 import org.wgz.shortlink.util.HashUtil;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -63,8 +67,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         try {
             baseMapper.insert(shortLinkDO);
         } catch (DuplicateKeyException e) {
-                log.warn("短链接 {} 重复入库", fullShortUrl);
-                throw new ServiceException("短链接生成重复");
+            log.warn("短链接 {} 重复入库", fullShortUrl);
+            throw new ServiceException("短链接生成重复");
         }
         shortUriCreateCachePenetrationBloomFilter.add(fullShortUrl);
         return ShortLinkCreateRespDTO.builder()
@@ -77,11 +81,22 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     @Override
     public IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkPageReqDTO shortLinkPageReqDTO) {
         LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
-                .eq(ShortLinkDO::getGid,shortLinkPageReqDTO.getGid())
-                .eq(ShortLinkDO::getEnableStatus,0)
+                .eq(ShortLinkDO::getGid, shortLinkPageReqDTO.getGid())
+                .eq(ShortLinkDO::getEnableStatus, 0)
                 .orderByDesc(ShortLinkDO::getCreateTime);
-        IPage<ShortLinkDO> shortLinkDOIPage = baseMapper.selectPage(shortLinkPageReqDTO,queryWrapper);
+        IPage<ShortLinkDO> shortLinkDOIPage = baseMapper.selectPage(shortLinkPageReqDTO, queryWrapper);
         return shortLinkDOIPage.convert(each -> BeanUtil.toBean(each, ShortLinkPageRespDTO.class));
+    }
+
+    @Override
+    public List<ShortLinkGroupCountQueryRespDTO> listGroupShortLinkCount(List<String> requestParam) {
+        QueryWrapper<ShortLinkDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("gid, count(*) as shortLinkCount")
+                .in("gid", requestParam)
+                .eq("enable_status", 0)
+                .groupBy("gid");
+        List<Map<String, Object>> resultMaps = baseMapper.selectMaps(queryWrapper);
+        return BeanUtil.copyToList(resultMaps, ShortLinkGroupCountQueryRespDTO.class);
     }
 
     private String generateSuffix(ShortLinkCreateReqDTO requestParam) {
