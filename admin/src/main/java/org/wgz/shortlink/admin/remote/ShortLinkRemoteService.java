@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.wgz.shortlink.admin.common.convention.result.Result;
 import org.wgz.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import org.wgz.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
+import org.wgz.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
 import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
@@ -58,5 +59,9 @@ public interface ShortLinkRemoteService {
         String resultStr = HttpUtil.get("http://127.0.0.1:9000/api/shortLink/v1/count", requestMap);
         return JSON.parseObject(resultStr, new TypeReference<>() {
         });
+    }
+
+    default void updateShortLink(ShortLinkUpdateReqDTO shortLinkUpdateReqDTO) {
+        HttpUtil.post("http://127.0.0.1:9000/api/shortLink/v1/update", JSON.toJSONString(shortLinkUpdateReqDTO));
     }
 }

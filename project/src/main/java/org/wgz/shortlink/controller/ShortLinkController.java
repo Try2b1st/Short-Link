@@ -7,6 +7,7 @@ import org.wgz.shortlink.common.convention.result.Result;
 import org.wgz.shortlink.common.convention.result.Results;
 import org.wgz.shortlink.dto.req.ShortLinkCreateReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkPageReqDTO;
+import org.wgz.shortlink.dto.req.ShortLinkUpdateReqDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkCreateRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkPageRespDTO;
@@ -33,12 +34,24 @@ public class ShortLinkController {
      * 分页查询短链接
      */
     @GetMapping("/v1/page")
-    public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO shortLinkPageReqDTO){
+    public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO shortLinkPageReqDTO) {
         return Results.success(shortLinkService.pageShortLink(shortLinkPageReqDTO));
     }
 
+    /**
+     * 系统内部调用：查看分组下短链接数目
+     *
+     * @param requestParam
+     * @return
+     */
     @GetMapping("/v1/count")
-    public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("requestParam") List<String> requestParam){
+    public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("requestParam") List<String> requestParam) {
         return Results.success(shortLinkService.listGroupShortLinkCount(requestParam));
+    }
+
+    @PostMapping("/v1/update")
+    public Result<Void> updateShortLink(@RequestBody ShortLinkUpdateReqDTO shortLinkUpdateReqDTO) {
+        shortLinkService.updateShortLink(shortLinkUpdateReqDTO);
+        return Results.success();
     }
 }

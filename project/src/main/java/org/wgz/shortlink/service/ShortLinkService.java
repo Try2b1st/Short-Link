@@ -5,6 +5,7 @@ import org.wgz.shortlink.dao.entity.ShortLinkDO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.wgz.shortlink.dto.req.ShortLinkCreateReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkPageReqDTO;
+import org.wgz.shortlink.dto.req.ShortLinkUpdateReqDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkCreateRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkPageRespDTO;
@@ -41,4 +42,12 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
      * @return 响应参数
      */
     List<ShortLinkGroupCountQueryRespDTO> listGroupShortLinkCount(List<String> requestParam);
+
+
+    /**
+     * 修改短链接
+     *
+     * @param shortLinkUpdateReqDTO 修改短链接请求参数
+     */
+    void updateShortLink(ShortLinkUpdateReqDTO shortLinkUpdateReqDTO);
 }
