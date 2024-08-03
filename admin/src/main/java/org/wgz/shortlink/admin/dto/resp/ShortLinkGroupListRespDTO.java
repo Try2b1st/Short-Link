@@ -23,5 +23,5 @@ public class ShortLinkGroupListRespDTO {
     /**
      * 当前分组下的短链接数
      */
-    private Integer num;
+    private Integer shortLinkCount;
 }
