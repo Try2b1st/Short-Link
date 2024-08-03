@@ -66,8 +66,12 @@ public class UserController {
         return Results.success();
     }
 
+    /**
+     * 用户登录
+     */
     @PostMapping("/v1/user/login")
     public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO userLoginReqDTO) {
+        System.out.println(userLoginReqDTO);
         return Results.success(userService.login(userLoginReqDTO));
     }
 

@@ -1,4 +1,4 @@
-package org.wgz.shortlink.dto.resp;
+package org.wgz.shortlink.admin.remote.dto.resp;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
