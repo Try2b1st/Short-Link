@@ -8,6 +8,9 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +25,8 @@ import org.wgz.shortlink.common.convention.exception.ClientException;
 import org.wgz.shortlink.common.convention.exception.ServiceException;
 import org.wgz.shortlink.common.enums.VailDateTypeEnum;
 import org.wgz.shortlink.dao.entity.ShortLinkDO;
+import org.wgz.shortlink.dao.entity.ShortLinkGotoDO;
+import org.wgz.shortlink.dao.mapper.ShortLinkGotoMapper;
 import org.wgz.shortlink.dao.mapper.ShortLinkMapper;
 import org.wgz.shortlink.dto.req.ShortLinkCreateReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkPageReqDTO;
@@ -54,9 +59,12 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     private final ShortLinkMapper shortLinkMapper;
 
+    private final ShortLinkGotoMapper shortLinkGotoMapper;
+
     //    @Value("")
     private String createShortLinkDefaultDomain = "https://www.jd.com";
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ShortLinkCreateRespDTO create(ShortLinkCreateReqDTO shortLinkCreateReqDTO) {
         String shortLinkSuffix = generateSuffix(shortLinkCreateReqDTO);
@@ -78,8 +86,15 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .fullShortUrl(fullShortUrl)
                 .build();
 
+        // 添加路由记录
+        ShortLinkGotoDO shortLinkGotoDO = ShortLinkGotoDO.builder()
+                .fullShortUrl(fullShortUrl)
+                .gid(shortLinkCreateReqDTO.getGid())
+                .build();
+
         try {
             baseMapper.insert(shortLinkDO);
+            shortLinkGotoMapper.insert(shortLinkGotoDO);
         } catch (DuplicateKeyException e) {
             log.warn("短链接 {} 重复入库", fullShortUrl);
             throw new ServiceException("短链接生成重复");
@@ -169,6 +184,29 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .favicon(getFavicon(requestParam.getOriginUrl()))
                     .build();
             baseMapper.insert(shortLinkDO);
+        }
+    }
+
+    @SneakyThrows
+    @Override
+    public void restoreUrl(String shortUri, ServletRequest request, ServletResponse response) {
+        String serverName = request.getServerName();
+        String fullShortUrl = serverName + "/" + shortUri;
+
+        LambdaQueryWrapper<ShortLinkGotoDO> linkGotoQueryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
+                .eq(ShortLinkGotoDO::getFullShortUrl,fullShortUrl);
+        ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(linkGotoQueryWrapper);
+        if(shortLinkGotoDO == null){
+            // 该短连接不存在路由
+            return;
+        }
+        LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
+                .eq(ShortLinkDO::getGid,shortLinkGotoDO.getGid())
+                .eq(ShortLinkDO::getFullShortUrl,fullShortUrl)
+                .eq(ShortLinkDO::getEnableStatus,0);
+        ShortLinkDO shortLinkDO = baseMapper.selectOne(queryWrapper);
+        if(shortLinkDO != null){
+            ((HttpServletResponse) response).sendRedirect(shortLinkDO.getOriginUrl());
         }
     }
 

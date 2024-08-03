@@ -1,6 +1,8 @@
 package org.wgz.shortlink.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import org.wgz.shortlink.dao.entity.ShortLinkDO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.wgz.shortlink.dto.req.ShortLinkCreateReqDTO;
@@ -14,9 +16,9 @@ import java.util.List;
 
 /**
 * @author 下水道的小老鼠
-* @description 针对表【t_link】的数据库操作Service
-* @createDate 2024-08-02 11:22:12
-*/
+* &#064;description  针对表【t_link】的数据库操作Service
+* &#064;createDate  2024-08-02 11:22:12
+ */
 public interface ShortLinkService extends IService<ShortLinkDO> {
 
     /**
@@ -50,4 +52,13 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
      * @param shortLinkUpdateReqDTO 修改短链接请求参数
      */
     void updateShortLink(ShortLinkUpdateReqDTO shortLinkUpdateReqDTO);
+
+    /**
+     * 短链接跳转
+     *
+     * @param shortUri 短链接
+     * @param request HTTP 请求参数
+     * @param response HTTP 响应
+     */
+    void restoreUrl(String shortUri, ServletRequest request, ServletResponse response);
 }
