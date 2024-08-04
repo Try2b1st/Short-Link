@@ -39,7 +39,8 @@ import org.wgz.shortlink.dto.resp.ShortLinkCreateRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkPageRespDTO;
 import org.wgz.shortlink.service.ShortLinkService;
-import org.wgz.shortlink.util.HashUtil;
+import org.wgz.shortlink.utils.HashUtil;
+import org.wgz.shortlink.utils.LinkUtil;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -111,6 +112,11 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             throw new ServiceException("短链接生成重复");
         }
 
+        //创建时进行缓存预热
+        stringRedisTemplate.opsForValue().set(
+                String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl),
+                shortLinkDO.getFullShortUrl(),
+                LinkUtil.getLinkCacheValidTime(shortLinkDO.getValidDate()));
         //布隆过滤器
         shortUriCreateCachePenetrationBloomFilter.add(fullShortUrl);
         return ShortLinkCreateRespDTO.builder()
@@ -210,10 +216,10 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         String serverName = request.getServerName();
         String fullShortUrl = serverName + "/" + shortUri;
 
-        if(shortUriCreateCachePenetrationBloomFilter.contains(fullShortUrl)){
+        if (shortUriCreateCachePenetrationBloomFilter.contains(fullShortUrl)) {
             // 看是否存在误判
-            if(StrUtil.isNotBlank(
-                    stringRedisTemplate.opsForValue().get(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl)))){
+            if (StrUtil.isNotBlank(
+                    stringRedisTemplate.opsForValue().get(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl)))) {
                 return;
             }
         }
@@ -240,7 +246,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(linkGotoQueryWrapper);
             if (shortLinkGotoDO == null) {
                 //可能会有缓存穿透
-                stringRedisTemplate.opsForValue().set(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl),"-",30, TimeUnit.MINUTES);
+                stringRedisTemplate.opsForValue().set(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl), "-", 30, TimeUnit.MINUTES);
                 return;
             }
             LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)

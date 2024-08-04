@@ -1,4 +1,4 @@
-package org.wgz.shortlink.util;
+package org.wgz.shortlink.utils;
 
 import cn.hutool.core.lang.hash.MurmurHash;
 
