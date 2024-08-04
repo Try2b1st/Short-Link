@@ -61,7 +61,25 @@ public interface ShortLinkRemoteService {
         });
     }
 
+    /**
+     * 修改短链接
+     *
+     * @param shortLinkUpdateReqDTO 修改短链接请求参数
+     */
     default void updateShortLink(ShortLinkUpdateReqDTO shortLinkUpdateReqDTO) {
         HttpUtil.post("http://127.0.0.1:9000/api/shortLink/v1/update", JSON.toJSONString(shortLinkUpdateReqDTO));
+    }
+
+
+    /**
+     * 根据 URL 获取网站标题
+     *
+     * @param url 网址
+     * @return 网站标题
+     */
+    default Result<String> getTitleByUrl(String url) {
+        String resultStr = HttpUtil.get("http://127.0.0.1:9000/api/shortLink/v1/title?url=" + url);
+        return JSON.parseObject(resultStr, new TypeReference<>() {
+        });
     }
 }
