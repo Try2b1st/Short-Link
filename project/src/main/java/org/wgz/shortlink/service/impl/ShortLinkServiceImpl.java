@@ -47,9 +47,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
-import static org.wgz.shortlink.common.constant.RedisKeyConstant.GOTO_SHORT_LINK_KEY;
-import static org.wgz.shortlink.common.constant.RedisKeyConstant.LOCK_GOTO_SHORT_LINK_KEY;
+import static org.wgz.shortlink.common.constant.RedisKeyConstant.*;
 
 /**
  * @author 下水道的小老鼠
@@ -73,7 +73,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final RedissonClient redissonClient;
 
     //    @Value("")
-    private String createShortLinkDefaultDomain = "wgz.link";
+    private final String createShortLinkDefaultDomain = "wgz.link";
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -85,7 +85,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .toString();
 
         ShortLinkDO shortLinkDO = ShortLinkDO.builder()
-                .domain(shortLinkCreateReqDTO.getDomain())
+                .domain(createShortLinkDefaultDomain)
                 .originUrl(shortLinkCreateReqDTO.getOriginUrl())
                 .gid(shortLinkCreateReqDTO.getGid())
                 .createdType(shortLinkCreateReqDTO.getCreatedType())
@@ -110,6 +110,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             log.warn("短链接 {} 重复入库", fullShortUrl);
             throw new ServiceException("短链接生成重复");
         }
+
+        //布隆过滤器
         shortUriCreateCachePenetrationBloomFilter.add(fullShortUrl);
         return ShortLinkCreateRespDTO.builder()
                 .gid(shortLinkCreateReqDTO.getGid())
@@ -208,6 +210,14 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         String serverName = request.getServerName();
         String fullShortUrl = serverName + "/" + shortUri;
 
+        if(shortUriCreateCachePenetrationBloomFilter.contains(fullShortUrl)){
+            // 看是否存在误判
+            if(StrUtil.isNotBlank(
+                    stringRedisTemplate.opsForValue().get(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl)))){
+                return;
+            }
+        }
+
         String originalUrl = stringRedisTemplate.opsForValue().get(String.format(GOTO_SHORT_LINK_KEY, fullShortUrl));
         if (StrUtil.isNotBlank(originalUrl)) {
             //存在缓存
@@ -229,7 +239,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
             ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(linkGotoQueryWrapper);
             if (shortLinkGotoDO == null) {
-                // 该短连接不存在路由
+                //可能会有缓存穿透
+                stringRedisTemplate.opsForValue().set(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl),"-",30, TimeUnit.MINUTES);
                 return;
             }
             LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
