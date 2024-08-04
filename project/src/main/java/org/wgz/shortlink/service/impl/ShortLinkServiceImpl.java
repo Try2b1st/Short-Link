@@ -62,7 +62,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final ShortLinkGotoMapper shortLinkGotoMapper;
 
     //    @Value("")
-    private String createShortLinkDefaultDomain = "https://www.jd.com";
+    private String createShortLinkDefaultDomain = "wgz.link";
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -103,7 +103,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         return ShortLinkCreateRespDTO.builder()
                 .gid(shortLinkCreateReqDTO.getGid())
                 .originUrl(shortLinkCreateReqDTO.getOriginUrl())
-                .fullShortUrl(shortLinkDO.getFullShortUrl())
+                .fullShortUrl("http://" + shortLinkDO.getFullShortUrl())
                 .build();
     }
 
@@ -194,18 +194,18 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         String fullShortUrl = serverName + "/" + shortUri;
 
         LambdaQueryWrapper<ShortLinkGotoDO> linkGotoQueryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
-                .eq(ShortLinkGotoDO::getFullShortUrl,fullShortUrl);
+                .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
         ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(linkGotoQueryWrapper);
-        if(shortLinkGotoDO == null){
+        if (shortLinkGotoDO == null) {
             // 该短连接不存在路由
             return;
         }
         LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
-                .eq(ShortLinkDO::getGid,shortLinkGotoDO.getGid())
-                .eq(ShortLinkDO::getFullShortUrl,fullShortUrl)
-                .eq(ShortLinkDO::getEnableStatus,0);
+                .eq(ShortLinkDO::getGid, shortLinkGotoDO.getGid())
+                .eq(ShortLinkDO::getFullShortUrl, fullShortUrl)
+                .eq(ShortLinkDO::getEnableStatus, 0);
         ShortLinkDO shortLinkDO = baseMapper.selectOne(queryWrapper);
-        if(shortLinkDO != null){
+        if (shortLinkDO != null) {
             ((HttpServletResponse) response).sendRedirect(shortLinkDO.getOriginUrl());
         }
     }
