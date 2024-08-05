@@ -233,7 +233,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             //存在缓存
             ((HttpServletResponse) response).sendRedirect(originalUrl);
             return;
-            6
         }
 
         RLock lock = redissonClient.getLock(String.format(LOCK_GOTO_SHORT_LINK_KEY, fullShortUrl));
