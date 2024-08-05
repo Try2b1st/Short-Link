@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.wgz.shortlink.admin.common.convention.result.Result;
+import org.wgz.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import org.wgz.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
 import org.wgz.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
 import org.wgz.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
@@ -81,5 +82,9 @@ public interface ShortLinkRemoteService {
         String resultStr = HttpUtil.get("http://127.0.0.1:9000/api/shortLink/v1/title?url=" + url);
         return JSON.parseObject(resultStr, new TypeReference<>() {
         });
+    }
+
+    default void saveRecycleBin(RecycleBinSaveReqDTO recycleBinSaveReqDTO){
+        HttpUtil.post("http://127.0.0.1:9000/api/shortLink/v1/recycle-bin/save", JSON.toJSONString(recycleBinSaveReqDTO));
     }
 }
