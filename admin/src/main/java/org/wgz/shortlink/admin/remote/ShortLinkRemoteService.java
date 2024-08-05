@@ -5,10 +5,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.wgz.shortlink.admin.common.convention.result.Result;
-import org.wgz.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
-import org.wgz.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
-import org.wgz.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
-import org.wgz.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
+import org.wgz.shortlink.admin.remote.dto.req.*;
 import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
@@ -84,7 +81,27 @@ public interface ShortLinkRemoteService {
         });
     }
 
-    default void saveRecycleBin(RecycleBinSaveReqDTO recycleBinSaveReqDTO){
+    /**
+     * 短链接移至回收站
+     */
+    default void saveRecycleBin(RecycleBinSaveReqDTO recycleBinSaveReqDTO) {
         HttpUtil.post("http://127.0.0.1:9000/api/shortLink/v1/recycle-bin/save", JSON.toJSONString(recycleBinSaveReqDTO));
+    }
+
+    /**
+     * 分页查询短链接
+     *
+     * @param shortLinkRecycleBinPageReqDTO 查询参数
+     * @return 短链接数据列表
+     */
+    default Result<IPage<ShortLinkPageRespDTO>> pageRecycleBinShortLink(ShortLinkRecycleBinPageReqDTO shortLinkRecycleBinPageReqDTO) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("gidList", shortLinkRecycleBinPageReqDTO.getGidList());
+        requestMap.put("current", shortLinkRecycleBinPageReqDTO.getCurrent());
+        requestMap.put("size", shortLinkRecycleBinPageReqDTO.getSize());
+
+        String resultPageStr = HttpUtil.get("http://127.0.0.1:9000/api/shortLink/v1/recycle-bin/page", requestMap);
+        return JSON.parseObject(resultPageStr, new TypeReference<>() {
+        });
     }
 }
