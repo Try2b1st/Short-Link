@@ -206,6 +206,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     .build();
             baseMapper.insert(shortLinkDO);
         }
+
+        // TODO
+        //更时进行删除原本缓存并缓存预热
     }
 
     @SneakyThrows
