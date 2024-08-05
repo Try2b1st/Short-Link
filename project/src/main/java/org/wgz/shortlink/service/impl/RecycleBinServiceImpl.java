@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.wgz.shortlink.dao.entity.ShortLinkDO;
 import org.wgz.shortlink.dao.mapper.ShortLinkMapper;
 import org.wgz.shortlink.dto.req.RecycleBinRecoverReqDTO;
+import org.wgz.shortlink.dto.req.RecycleBinRemoveReqDTO;
 import org.wgz.shortlink.dto.req.RecycleBinSaveReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkRecycleBinPageReqDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkPageRespDTO;
@@ -76,5 +77,15 @@ public class RecycleBinServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLin
 
         // 移至回收站后删除缓存
         stringRedisTemplate.delete(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, recycleBinRecoverReqDTO.getFullShortUrl()));
+    }
+
+    @Override
+    public void removeRecycleBin(RecycleBinRemoveReqDTO recycleBinRemoveReqDTO) {
+        LambdaUpdateWrapper<ShortLinkDO> updateWrapper = Wrappers.lambdaUpdate(ShortLinkDO.class)
+                .eq(ShortLinkDO::getGid, recycleBinRemoveReqDTO.getGid())
+                .eq(ShortLinkDO::getFullShortUrl, recycleBinRemoveReqDTO.getFullShortUrl())
+                .eq(ShortLinkDO::getEnableStatus, 1);
+
+        baseMapper.delete(updateWrapper);
     }
 }

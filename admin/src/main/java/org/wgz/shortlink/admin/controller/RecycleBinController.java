@@ -7,6 +7,7 @@ import org.wgz.shortlink.admin.common.convention.result.Result;
 import org.wgz.shortlink.admin.common.convention.result.Results;
 import org.wgz.shortlink.admin.remote.ShortLinkRemoteService;
 import org.wgz.shortlink.admin.remote.dto.req.RecycleBinRecoverReqDTO;
+import org.wgz.shortlink.admin.remote.dto.req.RecycleBinRemoveReqDTO;
 import org.wgz.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
 import org.wgz.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
 import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
@@ -42,6 +43,15 @@ public class RecycleBinController {
     @PostMapping("/v1/recycle-bin/recover")
     public Result<Void> recoverRecycleBin(@RequestBody RecycleBinRecoverReqDTO recycleBinRecoverReqDTO) {
         shortLinkRemoteService.recoverRecycleBin(recycleBinRecoverReqDTO);
+        return Results.success();
+    }
+
+    /**
+     * 从回收站删除短链接
+     */
+    @PostMapping("/v1/recycle-bin/remove")
+    public Result<Void> removeRecycleBin(@RequestBody RecycleBinRemoveReqDTO recycleBinRemoveReqDTO) {
+        shortLinkRemoteService.removeRecycleBin(recycleBinRemoveReqDTO);
         return Results.success();
     }
 }
