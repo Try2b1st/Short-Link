@@ -89,6 +89,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .createdType(shortLinkCreateReqDTO.getCreatedType())
                 .validDateType(shortLinkCreateReqDTO.getValidDateType())
                 .validDate(shortLinkCreateReqDTO.getValidDate())
+                .favicon(getFavicon(shortLinkCreateReqDTO.getOriginUrl()))
                 .describe(shortLinkCreateReqDTO.getDescribe())
                 .shortUri(shortLinkSuffix)
                 .enableStatus(0)
