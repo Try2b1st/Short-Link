@@ -110,6 +110,6 @@ public interface ShortLinkRemoteService {
     }
 
     default void removeRecycleBin(RecycleBinRemoveReqDTO recycleBinRemoveReqDTO) {
-        HttpUtil.post("http://localhost:9000/api/shortLink/v1/recycle-bin/remove", JSON.toJSONString(recycleBinRemoveReqDTO));=
+        HttpUtil.post("http://localhost:9000/api/shortLink/v1/recycle-bin/remove", JSON.toJSONString(recycleBinRemoveReqDTO));
     }
 }
