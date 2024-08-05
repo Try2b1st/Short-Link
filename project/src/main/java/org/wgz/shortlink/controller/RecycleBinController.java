@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.wgz.shortlink.common.convention.result.Result;
 import org.wgz.shortlink.common.convention.result.Results;
+import org.wgz.shortlink.dto.req.RecycleBinRecoverReqDTO;
 import org.wgz.shortlink.dto.req.RecycleBinSaveReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkRecycleBinPageReqDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkPageRespDTO;
@@ -32,5 +33,14 @@ public class RecycleBinController {
     @GetMapping("/v1/recycle-bin/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkRecycleBinPageReqDTO shortLinkRecycleBinPageReqDTO) {
         return Results.success(recycleBinService.pageShortLink(shortLinkRecycleBinPageReqDTO));
+    }
+
+    /**
+     * 从回收站回复短链接
+     */
+    @PostMapping("/v1/recycle-bin/recover")
+    public Result<Void> recoverRecycleBin(@RequestBody RecycleBinRecoverReqDTO recycleBinRecoverReqDTO) {
+        recycleBinService.recoverRecycleBin(recycleBinRecoverReqDTO);
+        return Results.success();
     }
 }

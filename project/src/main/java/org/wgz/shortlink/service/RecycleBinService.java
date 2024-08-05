@@ -3,12 +3,13 @@ package org.wgz.shortlink.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.wgz.shortlink.dao.entity.ShortLinkDO;
+import org.wgz.shortlink.dto.req.RecycleBinRecoverReqDTO;
 import org.wgz.shortlink.dto.req.RecycleBinSaveReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkRecycleBinPageReqDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkPageRespDTO;
 
 /**
-* @author 下水道的小老鼠
+ * @author 下水道的小老鼠
  */
 public interface RecycleBinService extends IService<ShortLinkDO> {
 
@@ -25,4 +26,11 @@ public interface RecycleBinService extends IService<ShortLinkDO> {
      * @return 响应分页数据
      */
     IPage<ShortLinkPageRespDTO> pageShortLink(ShortLinkRecycleBinPageReqDTO shortLinkRecycleBinPageReqDTO);
+
+    /**
+     * 从回收站回复短链接
+     *
+     * @param recycleBinRecoverReqDTO 请求参数
+     */
+    void recoverRecycleBin(RecycleBinRecoverReqDTO recycleBinRecoverReqDTO);
 }
