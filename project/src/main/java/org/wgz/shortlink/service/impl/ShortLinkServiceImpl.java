@@ -335,7 +335,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
             // 记录UIP
             String actualIP = LinkUtil.getActualIp((HttpServletRequest) request);
-            Long uipAdded = stringRedisTemplate.opsForSet().add("short-link:stats:uv" + fullShortUrl, actualIP);
+            Long uipAdded = stringRedisTemplate.opsForSet().add("short-link:stats:uip" + fullShortUrl, actualIP);
             boolean uipFirstFlag = uipAdded != null && uipAdded > 0L;
 
             //记录当前时间
