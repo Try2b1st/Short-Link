@@ -3,10 +3,13 @@ package org.wgz.shortlink.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.Week;
+import cn.hutool.core.lang.UUID;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.lang.UUID;
+import cn.hutool.http.HttpUtil;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -27,6 +30,7 @@ import org.jsoup.nodes.Element;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -35,9 +39,11 @@ import org.wgz.shortlink.common.convention.exception.ClientException;
 import org.wgz.shortlink.common.convention.exception.ServiceException;
 import org.wgz.shortlink.common.enums.VailDateTypeEnum;
 import org.wgz.shortlink.dao.entity.LinkAccessStatsDO;
+import org.wgz.shortlink.dao.entity.LinkLocaleStatsDO;
 import org.wgz.shortlink.dao.entity.ShortLinkDO;
 import org.wgz.shortlink.dao.entity.ShortLinkGotoDO;
 import org.wgz.shortlink.dao.mapper.LinkAccessStatsMapper;
+import org.wgz.shortlink.dao.mapper.LinkLocaleStatsMapper;
 import org.wgz.shortlink.dao.mapper.ShortLinkGotoMapper;
 import org.wgz.shortlink.dao.mapper.ShortLinkMapper;
 import org.wgz.shortlink.dto.req.ShortLinkCreateReqDTO;
@@ -57,6 +63,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.wgz.shortlink.common.constant.RedisKeyConstant.*;
+import static org.wgz.shortlink.common.constant.ShortLinkConstant.AMAP_REMOTE_URL;
 
 /**
  * @author 下水道的小老鼠
@@ -81,8 +88,13 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     private final LinkAccessStatsMapper linkAccessStatsMapper;
 
-    //    @Value("")
-    private final String createShortLinkDefaultDomain = "wgz.link";
+    private final LinkLocaleStatsMapper linkLocaleStatsMapper;
+
+    @Value("${short-link.default.domain}")
+    private String createShortLinkDefaultDomain;
+
+    @Value("${short-link.stats.locale.amap-key}")
+    private String statsLocaleAmapKey;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -297,7 +309,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
      * 短链接跳转统计
      *
      * @param fullShortUrl 完整短链接
-     * @param gid          粉猪标识
+     * @param gid          分组标识
      * @param request      HTTP 请求
      * @param response     HTTP 响应
      */
@@ -361,6 +373,31 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .date(now)
                         .build();
                 linkAccessStatsMapper.insertOrUpdateToStats(linkAccessStatsDO);
+
+                // 通过高德地图的IP定位API
+                // TODO 待优化http请求
+                Map<String, Object> localeParamMap = new HashMap<>();
+                localeParamMap.put("key", statsLocaleAmapKey);
+                localeParamMap.put("ip", actualIP);
+                String localeResultStr = HttpUtil.get(AMAP_REMOTE_URL, localeParamMap);
+                JSONObject localeResultObj = JSON.parseObject(localeResultStr);
+
+                LinkLocaleStatsDO linkLocaleStatsDO;
+                String infoCode = localeResultObj.getString("infocode");
+                if (StrUtil.isNotBlank(infoCode) && StrUtil.equals(infoCode, "10000")) {
+                    String province = localeResultObj.getString("province");
+                    boolean unknownFlag = StrUtil.equals(province,"[]");
+
+                    linkLocaleStatsDO = LinkLocaleStatsDO.builder()
+                            .fullShortUrl(fullShortUrl)
+                            .gid(gid)
+                            .province(unknownFlag ? "未知" : province)
+                            .city(unknownFlag ? "未知" : localeResultObj.getString("city"))
+                            .adcode(unknownFlag ? "未知" : localeResultObj.getString("adcode"))
+                            .date(now)
+                            .build();
+                    linkLocaleStatsMapper.shortLinkLocalStats(linkLocaleStatsDO);
+                }
             }
         } catch (Throwable ex) {
             log.error("短链接访问量统计异常", ex);
