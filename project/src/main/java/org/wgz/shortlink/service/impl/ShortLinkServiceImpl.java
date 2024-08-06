@@ -324,17 +324,19 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .findFirst()
                         .map(Cookie::getValue)
                         .ifPresentOrElse(each -> {
-                            Long added = stringRedisTemplate.opsForSet().add("short-link:stats:uv" + fullShortUrl, each);
+                            Long uvAdded = stringRedisTemplate.opsForSet().add("short-link:stats:uv" + fullShortUrl, each);
                             // 没有存储过返回 1
-                            uvFirstFlag.set(added != null && added > 0L);
+                            uvFirstFlag.set(uvAdded != null && uvAdded > 0L);
                         }, addResponseCookieTask);
             } else {
                 // 为空肯定为初次访问， uv必须记录
                 addResponseCookieTask.run();
             }
 
-            // 记录IP
-
+            // 记录UIP
+            String actualIP = LinkUtil.getActualIp((HttpServletRequest) request);
+            Long uipAdded = stringRedisTemplate.opsForSet().add("short-link:stats:uv" + fullShortUrl, actualIP);
+            boolean uipFirstFlag = uipAdded != null && uipAdded > 0L;
 
             //记录当前时间
             Date now = new Date();
@@ -351,7 +353,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 LinkAccessStatsDO linkAccessStatsDO = LinkAccessStatsDO.builder()
                         .pv(1)
                         .uv(uvFirstFlag.get() ? 1 : 0)
-                        .uip(1)
+                        .uip(uipFirstFlag ? 1 : 0)
                         .hour(hour)
                         .weekday(weekValue)
                         .gid(gid)
