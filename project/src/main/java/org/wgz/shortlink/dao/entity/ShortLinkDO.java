@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -103,6 +104,7 @@ public class ShortLinkDO implements Serializable {
     @TableLogic
     private Integer delFlag;
 
+    @Serial
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 

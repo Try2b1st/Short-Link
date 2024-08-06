@@ -1,6 +1,8 @@
 package org.wgz.shortlink.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.Week;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -28,8 +30,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.wgz.shortlink.common.convention.exception.ClientException;
 import org.wgz.shortlink.common.convention.exception.ServiceException;
 import org.wgz.shortlink.common.enums.VailDateTypeEnum;
+import org.wgz.shortlink.dao.entity.LinkAccessStatsDO;
 import org.wgz.shortlink.dao.entity.ShortLinkDO;
 import org.wgz.shortlink.dao.entity.ShortLinkGotoDO;
+import org.wgz.shortlink.dao.mapper.LinkAccessStatsMapper;
 import org.wgz.shortlink.dao.mapper.ShortLinkGotoMapper;
 import org.wgz.shortlink.dao.mapper.ShortLinkMapper;
 import org.wgz.shortlink.dto.req.ShortLinkCreateReqDTO;
@@ -69,6 +73,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final StringRedisTemplate stringRedisTemplate;
 
     private final RedissonClient redissonClient;
+
+    private final LinkAccessStatsMapper linkAccessStatsMapper;
 
     //    @Value("")
     private final String createShortLinkDefaultDomain = "wgz.link";
@@ -230,6 +236,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
         String originalUrl = stringRedisTemplate.opsForValue().get(String.format(GOTO_SHORT_LINK_KEY, fullShortUrl));
         if (StrUtil.isNotBlank(originalUrl)) {
+            shortLinkStats(fullShortUrl, null, request, response);
             //存在缓存
             ((HttpServletResponse) response).sendRedirect(originalUrl);
             return;
@@ -240,6 +247,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
         try {
             originalUrl = stringRedisTemplate.opsForValue().get(String.format(GOTO_SHORT_LINK_KEY, fullShortUrl));
             if (StrUtil.isNotBlank(originalUrl)) {
+                shortLinkStats(fullShortUrl, null, request, response);
                 //存在缓存
                 ((HttpServletResponse) response).sendRedirect(originalUrl);
                 return;
@@ -273,9 +281,49 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     String.format(GOTO_SHORT_LINK_KEY, fullShortUrl),
                     shortLinkDO.getFullShortUrl(),
                     LinkUtil.getLinkCacheValidTime(shortLinkDO.getValidDate()), TimeUnit.MILLISECONDS);
+            shortLinkStats(fullShortUrl, shortLinkDO.getGid(), request, response);
             ((HttpServletResponse) response).sendRedirect(shortLinkDO.getOriginUrl());
         } finally {
             lock.unlock();
+        }
+    }
+
+    /**
+     * 短链接跳转统计
+     *
+     * @param fullShortUrl 完整短链接
+     * @param gid          粉猪标识
+     * @param request      HTTP 请求
+     * @param response     HTTP 响应
+     */
+    public void shortLinkStats(String fullShortUrl, String gid, ServletRequest request, ServletResponse response) {
+        try {
+            //记录当前时间
+            Date now = new Date();
+            if (StrUtil.isBlank(gid)) {
+                LambdaQueryWrapper<ShortLinkGotoDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
+                        .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
+                ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(queryWrapper);
+                gid = shortLinkGotoDO.getGid();
+
+                int hour = DateUtil.hour(now, true);
+                Week week = DateUtil.dayOfWeekEnum(now);
+                int weekValue = week.getIso8601Value();
+
+                LinkAccessStatsDO linkAccessStatsDO = LinkAccessStatsDO.builder()
+                        .pv(1)
+                        .uv(1)
+                        .uip(1)
+                        .hour(hour)
+                        .weekday(weekValue)
+                        .gid(gid)
+                        .fullShortUrl(fullShortUrl)
+                        .date(now)
+                        .build();
+                linkAccessStatsMapper.insertOrUpdateToStats(linkAccessStatsDO);
+            }
+        } catch (Throwable ex) {
+            log.error("短链接访问量统计异常", ex);
         }
     }
 

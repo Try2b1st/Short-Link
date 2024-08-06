@@ -69,8 +69,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="TLinkGoto" />
-                  <option name="tableName" value="t_link_goto" />
+                  <option name="className" value="TLinkAccessStats" />
+                  <option name="tableName" value="t_link_access_stats" />
                 </TableUIInfo>
               </list>
             </option>
