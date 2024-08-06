@@ -4,7 +4,9 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.Week;
 import cn.hutool.core.text.StrBuilder;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.lang.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -13,6 +15,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -50,6 +54,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.wgz.shortlink.common.constant.RedisKeyConstant.*;
 
@@ -297,7 +302,40 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
      * @param response     HTTP 响应
      */
     public void shortLinkStats(String fullShortUrl, String gid, ServletRequest request, ServletResponse response) {
+
+        // 判断是否为独立用户
+        AtomicBoolean uvFirstFlag = new AtomicBoolean();
+        Cookie[] cookies = ((HttpServletRequest) request).getCookies();
         try {
+            Runnable addResponseCookieTask = () -> {
+                String uv = UUID.fastUUID().toString();
+                Cookie uvCookie = new Cookie("uv", uv);
+                uvCookie.setMaxAge(60 * 60 * 24 * 30);
+                uvCookie.setPath(StrUtil.sub(fullShortUrl, fullShortUrl.indexOf("/"), fullShortUrl.length()));
+                ((HttpServletResponse) response).addCookie(uvCookie);
+                uvFirstFlag.set(Boolean.TRUE);
+                stringRedisTemplate.opsForSet().add("short-link:stats:uv" + fullShortUrl, uv);
+            };
+
+            if (ArrayUtil.isNotEmpty(cookies)) {
+                //不一定为初次访问
+                Arrays.stream(cookies)
+                        .filter(each -> Objects.equals(each.getName(), "uv"))
+                        .findFirst()
+                        .map(Cookie::getValue)
+                        .ifPresentOrElse(each -> {
+                            Long added = stringRedisTemplate.opsForSet().add("short-link:stats:uv" + fullShortUrl, each);
+                            // 没有存储过返回 1
+                            uvFirstFlag.set(added != null && added > 0L);
+                        }, addResponseCookieTask);
+            } else {
+                // 为空肯定为初次访问， uv必须记录
+                addResponseCookieTask.run();
+            }
+
+            // 记录IP
+
+
             //记录当前时间
             Date now = new Date();
             if (StrUtil.isBlank(gid)) {
@@ -312,7 +350,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
                 LinkAccessStatsDO linkAccessStatsDO = LinkAccessStatsDO.builder()
                         .pv(1)
-                        .uv(1)
+                        .uv(uvFirstFlag.get() ? 1 : 0)
                         .uip(1)
                         .hour(hour)
                         .weekday(weekValue)
