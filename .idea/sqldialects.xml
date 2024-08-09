@@ -4,5 +4,6 @@
     <file url="file://$PROJECT_DIR$/admin/src/main/resources/mapper/UserMapper.xml" dialect="Sybase" />
     <file url="file://$PROJECT_DIR$/project/src/main/java/org/wgz/shortlink/dao/mapper/LinkAccessStatsMapper.java" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/project/src/main/java/org/wgz/shortlink/dao/mapper/LinkLocaleStatsMapper.java" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/project/src/main/java/org/wgz/shortlink/dao/mapper/LinkOsStatsMapper.java" dialect="MySQL" />
   </component>
 </project>
