@@ -69,8 +69,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="TLinkLocaleStats" />
-                  <option name="tableName" value="t_link_locale_stats" />
+                  <option name="className" value="TLinkOsStats" />
+                  <option name="tableName" value="t_link_os_stats" />
                 </TableUIInfo>
               </list>
             </option>

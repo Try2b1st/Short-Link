@@ -38,14 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.wgz.shortlink.common.convention.exception.ClientException;
 import org.wgz.shortlink.common.convention.exception.ServiceException;
 import org.wgz.shortlink.common.enums.VailDateTypeEnum;
-import org.wgz.shortlink.dao.entity.LinkAccessStatsDO;
-import org.wgz.shortlink.dao.entity.LinkLocaleStatsDO;
-import org.wgz.shortlink.dao.entity.ShortLinkDO;
-import org.wgz.shortlink.dao.entity.ShortLinkGotoDO;
-import org.wgz.shortlink.dao.mapper.LinkAccessStatsMapper;
-import org.wgz.shortlink.dao.mapper.LinkLocaleStatsMapper;
-import org.wgz.shortlink.dao.mapper.ShortLinkGotoMapper;
-import org.wgz.shortlink.dao.mapper.ShortLinkMapper;
+import org.wgz.shortlink.dao.entity.*;
+import org.wgz.shortlink.dao.mapper.*;
 import org.wgz.shortlink.dto.req.ShortLinkCreateReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkPageReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkUpdateReqDTO;
@@ -89,6 +83,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     private final LinkAccessStatsMapper linkAccessStatsMapper;
 
     private final LinkLocaleStatsMapper linkLocaleStatsMapper;
+
+    private final LinkOsStatsMapper linkOsStatsMapper;
 
     @Value("${short-link.default.domain}")
     private String createShortLinkDefaultDomain;
@@ -386,8 +382,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 String infoCode = localeResultObj.getString("infocode");
                 if (StrUtil.isNotBlank(infoCode) && StrUtil.equals(infoCode, "10000")) {
                     String province = localeResultObj.getString("province");
-                    boolean unknownFlag = StrUtil.equals(province,"[]");
+                    boolean unknownFlag = StrUtil.equals(province, "[]");
 
+                    // 记录IP地区位置
                     linkLocaleStatsDO = LinkLocaleStatsDO.builder()
                             .fullShortUrl(fullShortUrl)
                             .gid(gid)
@@ -397,6 +394,16 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                             .date(now)
                             .build();
                     linkLocaleStatsMapper.shortLinkLocalStats(linkLocaleStatsDO);
+
+                    // 记录用户使用的操作系统
+                    LinkOsStatsDO linkOsStatsDO = LinkOsStatsDO.builder()
+                            .os(LinkUtil.getOsByRequest((HttpServletRequest) request))
+                            .fullShortUrl(fullShortUrl)
+                            .date(now)
+                            .cnt(1)
+                            .gid(gid)
+                            .build();
+                    linkOsStatsMapper.upsertLinkOsStats(linkOsStatsDO);
                 }
             }
         } catch (Throwable ex) {

@@ -50,4 +50,35 @@ public class LinkUtil {
         }
         return request.getRemoteAddr();
     }
+
+    /**
+     * 获取操作系统
+     *
+     * @param request HTTP 请求
+     * @return 操作系统字符串
+     */
+    public static String getOsByRequest(HttpServletRequest request) {
+        String userAgent = request.getHeader("User-Agent");
+        String os = "Unknown OS";
+
+        if (userAgent == null) {
+            return os;
+        }
+
+        if (userAgent.toLowerCase().contains("windows")) {
+            os = "Windows";
+        } else if (userAgent.toLowerCase().contains("mac")) {
+            os = "Mac OS";
+        } else if (userAgent.toLowerCase().contains("x11")) {
+            os = "Unix";
+        } else if (userAgent.toLowerCase().contains("android")) {
+            os = "Android";
+        } else if (userAgent.toLowerCase().contains("iphone")) {
+            os = "iOS";
+        } else if (userAgent.toLowerCase().contains("linux")) {
+            os = "Linux";
+        }
+
+        return os;
+    }
 }
