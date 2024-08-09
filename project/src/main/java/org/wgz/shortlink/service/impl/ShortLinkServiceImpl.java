@@ -91,6 +91,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     private final LinkAccessLogsMapper linkAccessLogsMapper;
 
+    private final LinkDeviceStatsMapper linkDeviceStatsMapper;
+
     @Value("${short-link.default.domain}")
     private String createShortLinkDefaultDomain;
 
@@ -434,6 +436,16 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                             .gid(gid)
                             .build();
                     linkAccessLogsMapper.insert(linkAccessLogsDO);
+
+                    // 记录设备信息
+                    LinkDeviceStatsDO linkDeviceStatsDO = LinkDeviceStatsDO.builder()
+                            .device(LinkUtil.getDevice(((HttpServletRequest) request)))
+                            .cnt(1)
+                            .gid(gid)
+                            .fullShortUrl(fullShortUrl)
+                            .date(now)
+                            .build();
+                    linkDeviceStatsMapper.shortLinkDeviceState(linkDeviceStatsDO);
                 }
             }
         } catch (Throwable ex) {

@@ -69,8 +69,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="LinkAccessLogsDO" />
-                  <option name="tableName" value="t_link_access_logs" />
+                  <option name="className" value="LinkDeviceStats" />
+                  <option name="tableName" value="t_link_device_stats" />
                 </TableUIInfo>
               </list>
             </option>
