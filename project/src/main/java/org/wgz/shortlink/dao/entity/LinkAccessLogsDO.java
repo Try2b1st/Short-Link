@@ -10,10 +10,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 
  * @TableName t_link_access_logs
  */
-@TableName(value ="t_link_access_logs")
+@TableName(value = "t_link_access_logs")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -55,6 +54,12 @@ public class LinkAccessLogsDO implements Serializable {
      */
     private String ip;
 
+    private String network;
+
+    private String device;
+
+    private String locale;
+
     /**
      * 创建时间
      */
@@ -89,15 +94,15 @@ public class LinkAccessLogsDO implements Serializable {
         }
         LinkAccessLogsDO other = (LinkAccessLogsDO) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getFullShortUrl() == null ? other.getFullShortUrl() == null : this.getFullShortUrl().equals(other.getFullShortUrl()))
-            && (this.getGid() == null ? other.getGid() == null : this.getGid().equals(other.getGid()))
-            && (this.getUser() == null ? other.getUser() == null : this.getUser().equals(other.getUser()))
-            && (this.getBrowser() == null ? other.getBrowser() == null : this.getBrowser().equals(other.getBrowser()))
-            && (this.getOs() == null ? other.getOs() == null : this.getOs().equals(other.getOs()))
-            && (this.getIp() == null ? other.getIp() == null : this.getIp().equals(other.getIp()))
-            && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
-            && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
-            && (this.getDelFlag() == null ? other.getDelFlag() == null : this.getDelFlag().equals(other.getDelFlag()));
+                && (this.getFullShortUrl() == null ? other.getFullShortUrl() == null : this.getFullShortUrl().equals(other.getFullShortUrl()))
+                && (this.getGid() == null ? other.getGid() == null : this.getGid().equals(other.getGid()))
+                && (this.getUser() == null ? other.getUser() == null : this.getUser().equals(other.getUser()))
+                && (this.getBrowser() == null ? other.getBrowser() == null : this.getBrowser().equals(other.getBrowser()))
+                && (this.getOs() == null ? other.getOs() == null : this.getOs().equals(other.getOs()))
+                && (this.getIp() == null ? other.getIp() == null : this.getIp().equals(other.getIp()))
+                && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
+                && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
+                && (this.getDelFlag() == null ? other.getDelFlag() == null : this.getDelFlag().equals(other.getDelFlag()));
     }
 
     @Override

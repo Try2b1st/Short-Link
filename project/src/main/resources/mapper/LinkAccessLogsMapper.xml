@@ -5,22 +5,26 @@
 <mapper namespace="org.wgz.shortlink.dao.mapper.LinkAccessLogsMapper">
 
     <resultMap id="BaseResultMap" type="org.wgz.shortlink.dao.entity.LinkAccessLogsDO">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="fullShortUrl" column="full_short_url" jdbcType="VARCHAR"/>
-            <result property="gid" column="gid" jdbcType="VARCHAR"/>
-            <result property="user" column="user" jdbcType="VARCHAR"/>
-            <result property="browser" column="browser" jdbcType="VARCHAR"/>
-            <result property="os" column="os" jdbcType="VARCHAR"/>
-            <result property="ip" column="ip" jdbcType="VARCHAR"/>
-            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
-            <result property="delFlag" column="del_flag" jdbcType="TINYINT"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="fullShortUrl" column="full_short_url" jdbcType="VARCHAR"/>
+        <result property="gid" column="gid" jdbcType="VARCHAR"/>
+        <result property="user" column="user" jdbcType="VARCHAR"/>
+        <result property="browser" column="browser" jdbcType="VARCHAR"/>
+        <result property="os" column="os" jdbcType="VARCHAR"/>
+        <result property="ip" column="ip" jdbcType="VARCHAR"/>
+        <result property="network" column="network" jdbcType="VARCHAR"/>
+        <result property="device" column="device" jdbcType="VARCHAR"/>
+        <result property="locale" column="locale" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="delFlag" column="del_flag" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,full_short_url,gid,
+        id
+        ,full_short_url,gid,
         user,browser,os,
-        ip,create_time,update_time,
+        ip,network,device,locale,create_time,update_time,
         del_flag
     </sql>
 </mapper>
