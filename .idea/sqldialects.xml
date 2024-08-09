@@ -2,6 +2,7 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/admin/src/main/resources/mapper/UserMapper.xml" dialect="Sybase" />
+    <file url="file://$PROJECT_DIR$/project/src/main/java/org/wgz/shortlink/dao/mapper/LinkAccessLogsMapper.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/project/src/main/java/org/wgz/shortlink/dao/mapper/LinkAccessStatsMapper.java" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/project/src/main/java/org/wgz/shortlink/dao/mapper/LinkBrowserStatsMapper.java" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/project/src/main/java/org/wgz/shortlink/dao/mapper/LinkDeviceStatsMapper.java" dialect="MySQL" />
