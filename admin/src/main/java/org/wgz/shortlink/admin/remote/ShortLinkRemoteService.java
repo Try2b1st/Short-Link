@@ -9,6 +9,7 @@ import org.wgz.shortlink.admin.remote.dto.req.*;
 import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
+import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkStatsRespDTO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -111,5 +112,16 @@ public interface ShortLinkRemoteService {
 
     default void removeRecycleBin(RecycleBinRemoveReqDTO recycleBinRemoveReqDTO) {
         HttpUtil.post("http://localhost:9000/api/shortLink/v1/recycle-bin/remove", JSON.toJSONString(recycleBinRemoveReqDTO));
+    }
+
+    default Result<ShortLinkStatsRespDTO> oneShortLinkStats(ShortLinkStatsReqDTO requestParam) {
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("fullShortUrl", requestParam.getFullShortUrl());
+        requestMap.put("gid", requestParam.getGid());
+        requestMap.put("startDate", requestParam.getStartDate());
+        requestMap.put("endDate", requestParam.getEndDate());
+        String resultStr = HttpUtil.get("http://localhost:9000/api/short-link/v1/stats", requestMap);
+        return JSON.parseObject(resultStr, new TypeReference<>() {
+        });
     }
 }
