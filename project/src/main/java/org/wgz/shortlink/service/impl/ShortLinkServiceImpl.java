@@ -413,7 +413,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                             .cnt(1)
                             .gid(gid)
                             .fullShortUrl(fullShortUrl)
-                            .date(new Date())
+                            .date(now)
                             .build();
                     linkBrowserStatsMapper.shortLinkBrowserState(linkBrowserStatsDO);
                 }
