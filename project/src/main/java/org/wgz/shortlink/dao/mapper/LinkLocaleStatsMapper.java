@@ -14,9 +14,18 @@ import org.wgz.shortlink.dao.entity.LinkLocaleStatsDO;
 public interface LinkLocaleStatsMapper extends BaseMapper<LinkLocaleStatsDO> {
 
     @Insert("INSERT INTO t_link_locale_stats (" +
-            "full_short_url, gid, date, cnt, province, city, adcode, country, create_time, update_time, del_flag) " +
+            "full_short_url, gid, date, cnt, province, city, adcode, country, create_time, update_time) " +
             "VALUES (" +
-            "#{fullShortUrl}, #{gid}, #{date}, #{cnt}, #{province}, #{city}, #{adcode}, #{country}, NOW(), NOW(), #{delFlag}) " +
+            "#{linkLocaleStatsDO.fullShortUrl}, " +
+            "#{linkLocaleStatsDO.gid}, " +
+            "#{linkLocaleStatsDO.date}, " +
+            "#{linkLocaleStatsDO.cnt}," +
+            "#{linkLocaleStatsDO.province}, " +
+            "#{linkLocaleStatsDO.city}, " +
+            "#{linkLocaleStatsDO.adcode}, " +
+            "#{linkLocaleStatsDO.country}, " +
+            "NOW(), " +
+            "NOW()) " +
             "ON DUPLICATE KEY UPDATE " +
             "cnt = cnt + VALUES(cnt)")
     void shortLinkLocalStats(@Param("linkLocaleStatsDO") LinkLocaleStatsDO linkLocaleStatsDO);

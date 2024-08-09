@@ -13,11 +13,11 @@ import org.wgz.shortlink.dao.entity.LinkOsStatsDO;
  */
 public interface LinkOsStatsMapper extends BaseMapper<LinkOsStatsDO> {
     @Insert("INSERT INTO t_link_os_stats (" +
-            "full_short_url, gid, date, cnt, os, create_time, update_time, del_flag) " +
+            "full_short_url, gid, date, cnt, os, create_time, update_time) " +
             "VALUES (" +
-            "#{linkOsStats.fullShortUrl}, #{linkOsStats.gid}, #{linkOsStats.date}, #{linkOsStats.cnt}, #{linkOsStats.os}, NOW(), NOW(), #{linkOsStats.delFlag}) " +
+            "#{linkOsStats.fullShortUrl}, #{linkOsStats.gid}, #{linkOsStats.date}, #{linkOsStats.cnt}, #{linkOsStats.os}, NOW(), NOW()) " +
             "ON DUPLICATE KEY UPDATE " +
-            "cnt = cnt + VALUES(cnt), update_time = NOW()")
+            "cnt = cnt + VALUES(cnt)")
     void upsertLinkOsStats(@Param("linkOsStats") LinkOsStatsDO linkOsStats);
 }
 

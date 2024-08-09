@@ -69,8 +69,8 @@
             <option name="tableUIInfoList">
               <list>
                 <TableUIInfo>
-                  <option name="className" value="TLinkOsStats" />
-                  <option name="tableName" value="t_link_os_stats" />
+                  <option name="className" value="TLinkBrowserStats" />
+                  <option name="tableName" value="t_link_browser_stats" />
                 </TableUIInfo>
               </list>
             </option>

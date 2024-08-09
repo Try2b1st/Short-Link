@@ -86,6 +86,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     private final LinkOsStatsMapper linkOsStatsMapper;
 
+    private final LinkBrowserStatsMapper linkBrowserStatsMapper;
+
     @Value("${short-link.default.domain}")
     private String createShortLinkDefaultDomain;
 
@@ -404,6 +406,16 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                             .gid(gid)
                             .build();
                     linkOsStatsMapper.upsertLinkOsStats(linkOsStatsDO);
+
+                    // 记录浏览器数据
+                    LinkBrowserStatsDO linkBrowserStatsDO = LinkBrowserStatsDO.builder()
+                            .browser(LinkUtil.getBrowser(((HttpServletRequest) request)))
+                            .cnt(1)
+                            .gid(gid)
+                            .fullShortUrl(fullShortUrl)
+                            .date(new Date())
+                            .build();
+                    linkBrowserStatsMapper.shortLinkBrowserState(linkBrowserStatsDO);
                 }
             }
         } catch (Throwable ex) {
