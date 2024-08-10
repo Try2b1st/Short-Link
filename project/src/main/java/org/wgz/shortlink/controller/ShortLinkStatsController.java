@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.wgz.shortlink.common.convention.result.Result;
 import org.wgz.shortlink.common.convention.result.Results;
+import org.wgz.shortlink.dto.req.ShortLinkGroupStatsReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkStatsReqDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkStatsAccessRecordRespDTO;
@@ -28,6 +29,14 @@ public class ShortLinkStatsController {
     @GetMapping("/stats")
     public Result<ShortLinkStatsRespDTO> shortLinkStats(ShortLinkStatsReqDTO requestParam) {
         return Results.success(shortLinkStatsService.oneShortLinkStats(requestParam));
+    }
+
+    /**
+     * 访问分组内短链接指定时间内监控数据
+     */
+    @GetMapping("/group/stats")
+    public Result<ShortLinkStatsRespDTO> groupShortLinkStats(ShortLinkGroupStatsReqDTO requestParam) {
+        return Results.success(shortLinkStatsService.groupShortLinkStats(requestParam));
     }
 
     /**
