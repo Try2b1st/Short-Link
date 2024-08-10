@@ -7,17 +7,17 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * @author 下水道的小老鼠
- * @description 针对表【t_link】的数据库操作Mapper
- * @createDate 2024-08-02 11:22:12
- * @Entity generator.domain.TLink
+ * &#064;description  针对表【t_link】的数据库操作Mapper
+ * &#064;createDate  2024-08-02 11:22:12
+ * &#064;Entity  generator.domain.TLink
  */
 public interface ShortLinkMapper extends BaseMapper<ShortLinkDO> {
 
     @Update("update t_link set " +
             "total_uv = total_uv + #{totalUv}," +
-            "total_pv = total_pv + #{totalPV}," +
-            "total_uip = total_uip + #{totalUip}" +
-            "when gid = #{gid} and full_short_url = #{fullShortUrl}")
+            "total_pv = total_pv + #{totalPv}," +
+            "total_uip = total_uip + #{totalUip} " +
+            "where gid = #{gid} and full_short_url = #{fullShortUrl}")
     void incrementStats(
             @Param("gid") String gid,
             @Param("fullShortUrl") String fullShortUrl,

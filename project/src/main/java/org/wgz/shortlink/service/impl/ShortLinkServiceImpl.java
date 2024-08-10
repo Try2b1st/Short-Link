@@ -95,6 +95,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     private final LinkNetworkStatsMapper linkNetworkStatsMapper;
 
+    private final LinkStatsTodayMapper linkStatsTodayMapper;
+
     @Value("${short-link.default.domain}")
     private String createShortLinkDefaultDomain;
 
@@ -472,6 +474,17 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
                     // 短链接访问统计自增
                     shortLinkMapper.incrementStats(gid, fullShortUrl, uvFirstFlag.get() ? 1 : 0, 1, uipFirstFlag ? 1 : 0);
+
+                    // 每日统计表
+                    LinkStatsTodayDO linkStatsTodayDO = LinkStatsTodayDO.builder()
+                            .todayPv(1)
+                            .todayUv(uvFirstFlag.get() ? 1 : 0)
+                            .todayUip(uipFirstFlag ? 1 : 0)
+                            .gid(gid)
+                            .fullShortUrl(fullShortUrl)
+                            .date(now)
+                            .build();
+                    linkStatsTodayMapper.shortLinkTodayState(linkStatsTodayDO);
                 }
             }
         } catch (Throwable ex) {
