@@ -119,6 +119,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .validDate(shortLinkCreateReqDTO.getValidDate())
                 .favicon(getFavicon(shortLinkCreateReqDTO.getOriginUrl()))
                 .describe(shortLinkCreateReqDTO.getDescribe())
+                .totalUv(0)
+                .totalPv(0)
+                .totalUip(0)
                 .shortUri(shortLinkSuffix)
                 .enableStatus(0)
                 .fullShortUrl(fullShortUrl)
@@ -466,6 +469,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                             .gid(gid)
                             .build();
                     linkAccessLogsMapper.insert(linkAccessLogsDO);
+
+                    // 短链接访问统计自增
+                    shortLinkMapper.incrementStats(gid, fullShortUrl, uvFirstFlag.get() ? 1 : 0, 1, uipFirstFlag ? 1 : 0);
                 }
             }
         } catch (Throwable ex) {
