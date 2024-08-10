@@ -5,12 +5,10 @@ import org.springframework.web.bind.annotation.*;
 import org.wgz.shortlink.admin.common.convention.result.Result;
 import org.wgz.shortlink.admin.common.convention.result.Results;
 import org.wgz.shortlink.admin.remote.ShortLinkRemoteService;
-import org.wgz.shortlink.admin.remote.dto.req.ShortLinkCreateReqDTO;
-import org.wgz.shortlink.admin.remote.dto.req.ShortLinkPageReqDTO;
-import org.wgz.shortlink.admin.remote.dto.req.ShortLinkStatsReqDTO;
-import org.wgz.shortlink.admin.remote.dto.req.ShortLinkUpdateReqDTO;
+import org.wgz.shortlink.admin.remote.dto.req.*;
 import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
 import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
+import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkStatsAccessRecordRespDTO;
 import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkStatsRespDTO;
 
 @RestController
@@ -43,4 +41,11 @@ public class ShortLinkController {
         return shortLinkRemoteService.oneShortLinkStats(requestParam);
     }
 
+    /**
+     * 访问单个短链接指定时间内监控访问数据
+     */
+    @GetMapping("/v1/stats/access-record")
+    public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
+        return shortLinkRemoteService.shortLinkStatsAccessRecord(requestParam);
+    }
 }

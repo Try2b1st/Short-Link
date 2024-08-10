@@ -1,15 +1,13 @@
 package org.wgz.shortlink.admin.remote;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.wgz.shortlink.admin.common.convention.result.Result;
 import org.wgz.shortlink.admin.remote.dto.req.*;
-import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkCreateRespDTO;
-import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
-import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
-import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkStatsRespDTO;
+import org.wgz.shortlink.admin.remote.dto.resp.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -121,6 +119,16 @@ public interface ShortLinkRemoteService {
         requestMap.put("startDate", requestParam.getStartDate());
         requestMap.put("endDate", requestParam.getEndDate());
         String resultStr = HttpUtil.get("http://localhost:9000/api/short-link/v1/stats", requestMap);
+        return JSON.parseObject(resultStr, new TypeReference<>() {
+        });
+    }
+
+
+    default Result<IPage<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
+        Map<String, Object> requestMap = BeanUtil.beanToMap(requestParam, false, true);
+        requestMap.remove("orders");
+        requestMap.remove("records");
+        String resultStr = HttpUtil.get("http://localhost:9000/api/short-link/v1/stats/access-record", requestMap);
         return JSON.parseObject(resultStr, new TypeReference<>() {
         });
     }
