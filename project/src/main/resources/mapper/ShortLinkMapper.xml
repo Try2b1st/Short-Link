@@ -17,6 +17,9 @@
         <result property="validDateType" column="valid_date_type" jdbcType="TINYINT"/>
         <result property="validDate" column="valid_date" jdbcType="TIMESTAMP"/>
         <result property="describe" column="describe" jdbcType="VARCHAR"/>
+        <result property="totalUv" column="total_uv" jdbcType="INTEGER"/>
+        <result property="totalPv" column="total_pv" jdbcType="INTEGER"/>
+        <result property="totalUip" column="total_uip" jdbcType="INTEGER"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
         <result property="delFlag" column="del_flag" jdbcType="TINYINT"/>
@@ -29,7 +32,7 @@
         ,domain,short_uri,
         full_short_url,origin_url,click_num,
         gid,enable_status,created_type,
-        valid_date_type,valid_date,describe,
+        valid_date_type,valid_date,describe,total_uv,total_pv,total_uip
         create_time,update_time,del_flag,favicon
     </sql>
 </mapper>

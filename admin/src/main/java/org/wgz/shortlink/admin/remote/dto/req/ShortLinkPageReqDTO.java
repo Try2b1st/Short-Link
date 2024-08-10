@@ -19,6 +19,11 @@ public class ShortLinkPageReqDTO extends Page implements Serializable {
      */
     private String gid;
 
+    /**
+     * 排序标识
+     */
+    private String orderTag;
+
     @Serial
     private static final long serialVersionUID = 1L;
 }

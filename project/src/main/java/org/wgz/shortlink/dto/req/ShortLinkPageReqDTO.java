@@ -20,6 +20,11 @@ public class ShortLinkPageReqDTO extends Page<ShortLinkDO> implements Serializab
      */
     private String gid;
 
+    /**
+     * 排序标识
+     */
+    private String orderTag;
+
     @Serial
     private static final long serialVersionUID = 1L;
 }

@@ -67,4 +67,34 @@ public class ShortLinkPageRespDTO {
      */
     private String describe;
 
+    /**
+     * 累计UV
+     */
+    private Integer totalUv;
+
+    /**
+     * 累计PV
+     */
+    private Integer totalPv;
+
+    /**
+     * 累计UIP
+     */
+    private Integer totalUip;
+
+    /**
+     * 今日UV
+     */
+    private Integer todayUv;
+
+    /**
+     * 今日PV
+     */
+    private Integer todayPv;
+
+    /**
+     * 今日UIP
+     */
+    private Integer todayUip;
+
 }

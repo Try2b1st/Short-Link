@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.wgz.shortlink.dao.mapper.LinkStatsTodayMapper">
+
+    <resultMap id="BaseResultMap" type="org.wgz.shortlink.dao.entity.LinkStatsTodayDO">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="gid" column="gid" jdbcType="VARCHAR"/>
+            <result property="fullShortUrl" column="full_short_url" jdbcType="VARCHAR"/>
+            <result property="date" column="date" jdbcType="DATE"/>
+            <result property="todayPv" column="today_pv" jdbcType="INTEGER"/>
+            <result property="todayUv" column="today_uv" jdbcType="INTEGER"/>
+            <result property="todayUip" column="today_uip" jdbcType="INTEGER"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="delFlag" column="del_flag" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,gid,full_short_url,
+        date,today_pv,today_uv,
+        today_uip,create_time,update_time,
+        del_flag
+    </sql>
+</mapper>
