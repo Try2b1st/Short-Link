@@ -1,9 +1,11 @@
 package org.wgz.shortlink.dao.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
 import org.wgz.shortlink.dao.entity.ShortLinkDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.wgz.shortlink.dto.req.ShortLinkPageReqDTO;
 
 /**
  * @author 下水道的小老鼠
@@ -25,6 +27,8 @@ public interface ShortLinkMapper extends BaseMapper<ShortLinkDO> {
             @Param("totalPv") Integer totalPv,
             @Param("totalUip") Integer totalUip
     );
+
+    IPage<ShortLinkDO> pageLink(ShortLinkPageReqDTO requestParam);
 }
 
 
