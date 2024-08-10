@@ -39,6 +39,10 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
 
     @Override
     public ShortLinkStatsRespDTO oneShortLinkStats(ShortLinkStatsReqDTO requestParam) {
+
+        // 基础访问数据
+        LinkAccessStatsDO linkAccessStatsDO = linkAccessLogsMapper.findPvUvUidStatsShortLink(requestParam);
+
         // 基础访问详情
         List<LinkAccessStatsDO> listStatsByShortLink = linkAccessStatsMapper.listStatsByShortLink(requestParam);
 
@@ -188,6 +192,9 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
         });
 
         return ShortLinkStatsRespDTO.builder()
+                .pv(linkAccessStatsDO.getPv())
+                .uv(linkAccessStatsDO.getUv())
+                .uip(linkAccessStatsDO.getUip())
                 .daily(BeanUtil.copyToList(listStatsByShortLink, ShortLinkStatsAccessDailyRespDTO.class))
                 .localeCnStats(localeCnStats)
                 .hourStats(hourStats)

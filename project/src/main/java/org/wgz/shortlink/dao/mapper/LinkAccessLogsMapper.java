@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.wgz.shortlink.dao.entity.LinkAccessLogsDO;
+import org.wgz.shortlink.dao.entity.LinkAccessStatsDO;
 import org.wgz.shortlink.dto.req.ShortLinkStatsReqDTO;
 
 import java.util.HashMap;
@@ -90,6 +91,18 @@ public interface LinkAccessLogsMapper extends BaseMapper<LinkAccessLogsDO> {
             @Param("endDate") String endDate,
             @Param("userAccessLogList") List<String> userAccessLogsList
     );
+
+    /**
+     * 查询单个短链接的总 UV PV UIP 记录
+     *
+     * @param requestParam 请求参数
+     * @return LinkAccessStatsDO 实体
+     */
+    @Select("select full_short_url, gid, COUNT(user) as pv, COUNT(DISTINCT user) as uv, COUNT(DISTINCT ip) as uip " +
+            "from t_link_access_logs " +
+            "where full_short_url = #{param.fullShortUrl} and gid = #{param.gid} and create_time BETWEEN #{param.startDate} and #{param.endDate} " +
+            "group by full_short_url, gid")
+    LinkAccessStatsDO findPvUvUidStatsShortLink(@Param("param") ShortLinkStatsReqDTO requestParam);
 
 }
 
