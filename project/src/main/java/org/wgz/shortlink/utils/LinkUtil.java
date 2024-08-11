@@ -52,7 +52,7 @@ public class LinkUtil {
      * @param request HTTP 请求
      * @return 操作系统字符串
      */
-    public static String getOsByRequest(HttpServletRequest request) {
+    public static String getOs(HttpServletRequest request) {
         String userAgent = request.getHeader("User-Agent");
         String os = "Unknown OS";
 

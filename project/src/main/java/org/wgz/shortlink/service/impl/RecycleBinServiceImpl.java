@@ -37,12 +37,15 @@ public class RecycleBinServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLin
         LambdaUpdateWrapper<ShortLinkDO> updateWrapper = Wrappers.lambdaUpdate(ShortLinkDO.class)
                 .eq(ShortLinkDO::getGid, recycleBinSaveReqDTO.getGid())
                 .eq(ShortLinkDO::getFullShortUrl, recycleBinSaveReqDTO.getFullShortUrl())
+                .eq(ShortLinkDO::getDelTime, 0L)
                 .eq(ShortLinkDO::getEnableStatus, 0);
 
-        ShortLinkDO shortLinkDO = ShortLinkDO.builder()
+        ShortLinkDO delShortLinkDO = ShortLinkDO.builder()
+                .delTime(System.currentTimeMillis())
                 .enableStatus(1)
                 .build();
-        baseMapper.update(shortLinkDO, updateWrapper);
+        delShortLinkDO.setDelFlag(1);
+        baseMapper.update(delShortLinkDO, updateWrapper);
 
         // 移至回收站后删除缓存
         stringRedisTemplate.delete(String.format(GOTO_SHORT_LINK_KEY, recycleBinSaveReqDTO.getFullShortUrl()));
