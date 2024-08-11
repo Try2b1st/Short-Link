@@ -37,7 +37,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.wgz.shortlink.common.convention.exception.ClientException;
 import org.wgz.shortlink.common.convention.exception.ServiceException;
-import org.wgz.shortlink.common.enums.VailDateTypeEnum;
 import org.wgz.shortlink.dao.entity.*;
 import org.wgz.shortlink.dao.mapper.*;
 import org.wgz.shortlink.dto.req.ShortLinkBatchCreateReqDTO;
@@ -58,6 +57,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.wgz.shortlink.common.constant.RedisKeyConstant.*;
 import static org.wgz.shortlink.common.constant.ShortLinkConstant.AMAP_REMOTE_URL;
+import static org.wgz.shortlink.common.enums.VailDateTypeEnum.PERMANENT;
 
 /**
  * @author 下水道的小老鼠
@@ -230,13 +230,12 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
         if (Objects.equals(hasShortLinkDO.getGid(), requestParam.getGid())) {
             // 用户没有修改 gid
-
             LambdaUpdateWrapper<ShortLinkDO> updateWrapper = Wrappers.lambdaUpdate(ShortLinkDO.class)
                     .eq(ShortLinkDO::getFullShortUrl, requestParam.getFullShortUrl())
                     .eq(ShortLinkDO::getGid, requestParam.getGid())
                     .eq(ShortLinkDO::getDelFlag, 0)
                     .eq(ShortLinkDO::getEnableStatus, 0)
-                    .set(Objects.equals(requestParam.getValidDateType(), VailDateTypeEnum.PERMANENT.getType()), ShortLinkDO::getValidDate, null);
+                    .set(Objects.equals(requestParam.getValidDateType(), PERMANENT.getType()), ShortLinkDO::getValidDate, null);
 
             ShortLinkDO shortLinkDO = ShortLinkDO.builder()
                     .domain(hasShortLinkDO.getDomain())
@@ -270,8 +269,22 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             baseMapper.insert(shortLinkDO);
         }
 
-        // TODO
-        //更时进行删除原本缓存并缓存预热
+        // 操作缓存
+        if (!Objects.equals(hasShortLinkDO.getValidDateType(), requestParam.getValidDateType())
+                || !Objects.equals(hasShortLinkDO.getValidDate(), requestParam.getValidDate())) {
+            // 之前是 正常状态 1.永久有效期 2.当前时间在有效期内
+            stringRedisTemplate.delete(String.format(GOTO_SHORT_LINK_KEY, requestParam.getFullShortUrl()));
+            // 之前是 不可用状态 1.当前不在有效期
+            if (Objects.equals(requestParam.getValidDateType(), PERMANENT.getType()) ||
+                    (requestParam.getValidDate() != null && requestParam.getValidDate().before(new Date()))) {
+                stringRedisTemplate.delete(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, requestParam.getFullShortUrl()));
+            }
+        }
+        //修改了原始短链接
+        if (!Objects.equals(hasShortLinkDO.getOriginUrl(), requestParam.getOriginGid())) {
+            stringRedisTemplate.delete(String.format(GOTO_SHORT_LINK_KEY, hasShortLinkDO.getFullShortUrl()));
+            stringRedisTemplate.opsForValue().set(String.format(GOTO_SHORT_LINK_KEY, hasShortLinkDO.getShortUri()), requestParam.getOriginUrl());
+        }
     }
 
     @SneakyThrows
@@ -314,6 +327,12 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 ((HttpServletResponse) response).sendRedirect(originalUrl);
                 return;
             }
+
+//            if (StrUtil.isNotBlank(
+//                    stringRedisTemplate.opsForValue().get(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl)))) {
+//                ((HttpServletResponse) response).sendRedirect(NOT_FOUND_URL);
+//                return;
+//            }
 
             LambdaQueryWrapper<ShortLinkGotoDO> linkGotoQueryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
                     .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
