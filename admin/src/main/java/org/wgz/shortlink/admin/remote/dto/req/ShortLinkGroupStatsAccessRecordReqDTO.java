@@ -1,18 +1,12 @@
-package org.wgz.shortlink.dto.req;
+package org.wgz.shortlink.admin.remote.dto.req;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.wgz.shortlink.dao.entity.LinkAccessLogsDO;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ShortLinkStatsAccessRecordReqDTO extends Page<LinkAccessLogsDO> {
-    /**
-     * 完整短链接
-     */
-    private String fullShortUrl;
-
+public class ShortLinkGroupStatsAccessRecordReqDTO extends Page {
     /**
      * 分组标识
      */

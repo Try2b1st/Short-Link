@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.wgz.shortlink.dao.entity.*;
 import org.wgz.shortlink.dao.mapper.*;
+import org.wgz.shortlink.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkGroupStatsReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkStatsReqDTO;
@@ -227,6 +228,39 @@ public class ShortLinkStatsServiceImpl implements ShortLinkStatsService {
         List<Map<String, Object>> uvTypeList = linkAccessLogsMapper.selectUvTypeByUsers(
                 requestParam.getGid(),
                 requestParam.getFullShortUrl(),
+                requestParam.getStartDate(),
+                requestParam.getEndDate(),
+                userAccessLogsList
+        );
+
+        actualResult.getRecords().forEach(each -> {
+            String uvType = uvTypeList.stream()
+                    .filter(item -> Objects.equals(item.get("user"), each.getUser()))
+                    .findFirst()
+                    .map(item -> item.get("uvType"))
+                    .map(Object::toString)
+                    .orElse("旧访客");
+            each.setUvType(uvType);
+        });
+
+        return actualResult;
+    }
+
+    @Override
+    public IPage<ShortLinkStatsAccessRecordRespDTO> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+        LambdaQueryWrapper<LinkAccessLogsDO> queryWrapper = Wrappers.lambdaQuery(LinkAccessLogsDO.class)
+                .eq(LinkAccessLogsDO::getGid, requestParam.getGid())
+                .between(LinkAccessLogsDO::getCreateTime, requestParam.getStartDate(), requestParam.getEndDate())
+                .orderByDesc(LinkAccessLogsDO::getCreateTime);
+        IPage<LinkAccessLogsDO> linkAccessLogsDOIPage = linkAccessLogsMapper.selectPage(requestParam, queryWrapper);
+        IPage<ShortLinkStatsAccessRecordRespDTO> actualResult = linkAccessLogsDOIPage.convert(each ->
+                BeanUtil.toBean(each, ShortLinkStatsAccessRecordRespDTO.class));
+        List<String> userAccessLogsList = actualResult.getRecords().stream()
+                .map(ShortLinkStatsAccessRecordRespDTO::getUser)
+                .toList();
+
+        List<Map<String, Object>> uvTypeList = linkAccessLogsMapper.selectGroupUvTypeByUsers(
+                requestParam.getGid(),
                 requestParam.getStartDate(),
                 requestParam.getEndDate(),
                 userAccessLogsList

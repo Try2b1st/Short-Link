@@ -48,4 +48,12 @@ public class ShortLinkController {
     public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam) {
         return shortLinkRemoteService.shortLinkStatsAccessRecord(requestParam);
     }
+
+    /**
+     * 访问分组短链接指定时间内监控数据
+     */
+    @GetMapping("/v1/stats/access-record/group")
+    public Result<IPage<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+        return shortLinkRemoteService.groupShortLinkStatsAccessRecord(requestParam);
+    }
 }

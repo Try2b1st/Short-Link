@@ -7,12 +7,7 @@ import org.wgz.shortlink.dao.entity.LinkAccessLogsDO;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ShortLinkStatsAccessRecordReqDTO extends Page<LinkAccessLogsDO> {
-    /**
-     * 完整短链接
-     */
-    private String fullShortUrl;
-
+public class ShortLinkGroupStatsAccessRecordReqDTO extends Page<LinkAccessLogsDO> {
     /**
      * 分组标识
      */

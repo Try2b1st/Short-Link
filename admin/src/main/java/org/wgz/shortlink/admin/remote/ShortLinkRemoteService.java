@@ -36,7 +36,7 @@ public interface ShortLinkRemoteService {
     default Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO shortLinkPageReqDTO) {
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("gid", shortLinkPageReqDTO.getGid());
-        requestMap.put("orderTag",shortLinkPageReqDTO.getOrderTag());
+        requestMap.put("orderTag", shortLinkPageReqDTO.getOrderTag());
         requestMap.put("current", shortLinkPageReqDTO.getCurrent());
         requestMap.put("size", shortLinkPageReqDTO.getSize());
 
@@ -143,6 +143,15 @@ public interface ShortLinkRemoteService {
     default Result<ShortLinkStatsRespDTO> groupShortLinkStats(ShortLinkGroupStatsReqDTO requestParam) {
         String resultBodyStr = HttpUtil.get("http://127.0.0.1:8001/api/short-link/v1/stats/group", BeanUtil.beanToMap(requestParam));
         return JSON.parseObject(resultBodyStr, new TypeReference<>() {
+        });
+    }
+
+    default Result<IPage<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam) {
+        Map<String, Object> requestMap = BeanUtil.beanToMap(requestParam, false, true);
+        requestMap.remove("orders");
+        requestMap.remove("records");
+        String resultStr = HttpUtil.get("http://localhost:9000/api/short-link/v1/stats/access-record/group", requestMap);
+        return JSON.parseObject(resultStr, new TypeReference<>() {
         });
     }
 }

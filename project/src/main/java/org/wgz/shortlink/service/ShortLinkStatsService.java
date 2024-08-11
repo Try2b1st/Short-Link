@@ -1,6 +1,7 @@
 package org.wgz.shortlink.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.wgz.shortlink.dto.req.ShortLinkGroupStatsAccessRecordReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkGroupStatsReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkStatsAccessRecordReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkStatsReqDTO;
@@ -21,12 +22,20 @@ public interface ShortLinkStatsService {
     ShortLinkStatsRespDTO oneShortLinkStats(ShortLinkStatsReqDTO requestParam);
 
     /**
-     * 分页查询访问记录
+     * 分页查询单个短链接访问记录
      *
      * @param requestParam 请求参数
      * @return 访问数据
      */
     IPage<ShortLinkStatsAccessRecordRespDTO> shortLinkStatsAccessRecord(ShortLinkStatsAccessRecordReqDTO requestParam);
+
+    /**
+     * 分页查询分组短链接访问记录
+     *
+     * @param requestParam 请求参数
+     * @return 访问数据
+     */
+    IPage<ShortLinkStatsAccessRecordRespDTO> groupShortLinkStatsAccessRecord(ShortLinkGroupStatsAccessRecordReqDTO requestParam);
 
     /**
      * 获取分组短链接监控数据
