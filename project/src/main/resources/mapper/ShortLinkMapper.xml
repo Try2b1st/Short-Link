@@ -22,6 +22,7 @@
         <result property="totalUip" column="total_uip" jdbcType="INTEGER"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="delTime" column="del_time" jdbcType="BIGINT"/>
         <result property="delFlag" column="del_flag" jdbcType="TINYINT"/>
         <result property="favicon" column="favicon" jdbcType="VARCHAR"/>
 
@@ -33,8 +34,18 @@
         full_short_url,origin_url,click_num,
         gid,enable_status,created_type,
         valid_date_type,valid_date,describe,total_uv,total_pv,total_uip
-        create_time,update_time,del_flag,favicon
+        create_time,update_time,del_time,del_flag,favicon
     </sql>
+
+    <!-- 自增短链接访问次数 -->
+    <update id="incrementStats">
+        UPDATE t_link
+        SET total_pv  = total_pv + #{totalPv},
+            total_uv  = total_uv + #{totalUv},
+            total_uip = total_uip + #{totalUip}
+        WHERE gid = #{gid}
+          AND full_short_url = #{fullShortUrl}
+    </update>
 
     <!-- 分页查询短链接 -->
     <select id="pageLink"
@@ -73,5 +84,25 @@
                 ORDER BY t.create_time DESC
             </otherwise>
         </choose>
+    </select>
+
+    <!-- 分页统计回收站短链接 -->
+    <select id="pageRecycleBinLink"
+            parameterType="org.wgz.shortlink.dto.req.ShortLinkRecycleBinPageReqDTO"
+            resultType="org.wgz.shortlink.dao.entity.ShortLinkDO">
+        SELECT t.*,
+        COALESCE(s.today_pv, 0) AS todayPv,
+        COALESCE(s.today_uv, 0) AS todayUv,
+        COALESCE(s.today_uip, 0) AS todayUip
+        FROM t_link t
+        LEFT JOIN t_link_stats_today s ON t.full_short_url = s.full_short_url
+        AND s.date = CURDATE()
+        WHERE t.gid IN
+        <foreach item='item' index='index' collection='gidList' open='(' separator=',' close=')'>
+            #{item}
+        </foreach>
+        AND t.enable_status = 1
+        AND t.del_flag = 0
+        ORDER by t.update_time
     </select>
 </mapper>

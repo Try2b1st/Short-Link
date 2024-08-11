@@ -3,10 +3,11 @@ package org.wgz.shortlink.admin.remote.dto.req;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.wgz.shortlink.dao.entity.LinkAccessLogsDO;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ShortLinkStatsAccessRecordReqDTO extends Page {
+public class ShortLinkStatsAccessRecordReqDTO extends Page<LinkAccessLogsDO> {
     /**
      * 完整短链接
      */
@@ -26,4 +27,9 @@ public class ShortLinkStatsAccessRecordReqDTO extends Page {
      * 结束日期
      */
     private String endDate;
+
+    /**
+     * 启用标识 0：启用 1：未启用
+     */
+    private Integer enableStatus;
 }

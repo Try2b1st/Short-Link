@@ -13,8 +13,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface LinkStatsTodayMapper extends BaseMapper<LinkStatsTodayDO> {
 
-    @Insert("INSERT INTO t_link_stats_today (gid,full_short_url,date,today_pv,today_uv,today_uip,create_time,update_time)" +
-            "VALUES (#{linkStatsTodayDO.gid}," +
+    @Insert("INSERT INTO t_link_stats_today (full_short_url,date,today_pv,today_uv,today_uip,create_time,update_time)" +
+            "VALUES ( "+
             "#{linkStatsTodayDO.fullShortUrl}," +
             "#{linkStatsTodayDO.date}," +
             "#{linkStatsTodayDO.todayPv}," +

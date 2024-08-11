@@ -30,11 +30,6 @@ public class LinkAccessLogsDO implements Serializable {
     private String fullShortUrl;
 
     /**
-     * 分组标识
-     */
-    private String gid;
-
-    /**
      * 用户信息
      */
     private String user;
@@ -54,10 +49,19 @@ public class LinkAccessLogsDO implements Serializable {
      */
     private String ip;
 
+    /**
+     * 访问网络
+     */
     private String network;
 
+    /**
+     * 访问设备
+     */
     private String device;
 
+    /**
+     * 访问设备
+     */
     private String locale;
 
     /**
@@ -95,7 +99,6 @@ public class LinkAccessLogsDO implements Serializable {
         LinkAccessLogsDO other = (LinkAccessLogsDO) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
                 && (this.getFullShortUrl() == null ? other.getFullShortUrl() == null : this.getFullShortUrl().equals(other.getFullShortUrl()))
-                && (this.getGid() == null ? other.getGid() == null : this.getGid().equals(other.getGid()))
                 && (this.getUser() == null ? other.getUser() == null : this.getUser().equals(other.getUser()))
                 && (this.getBrowser() == null ? other.getBrowser() == null : this.getBrowser().equals(other.getBrowser()))
                 && (this.getOs() == null ? other.getOs() == null : this.getOs().equals(other.getOs()))
@@ -111,7 +114,6 @@ public class LinkAccessLogsDO implements Serializable {
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getFullShortUrl() == null) ? 0 : getFullShortUrl().hashCode());
-        result = prime * result + ((getGid() == null) ? 0 : getGid().hashCode());
         result = prime * result + ((getUser() == null) ? 0 : getUser().hashCode());
         result = prime * result + ((getBrowser() == null) ? 0 : getBrowser().hashCode());
         result = prime * result + ((getOs() == null) ? 0 : getOs().hashCode());
@@ -130,7 +132,6 @@ public class LinkAccessLogsDO implements Serializable {
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
         sb.append(", fullShortUrl=").append(fullShortUrl);
-        sb.append(", gid=").append(gid);
         sb.append(", user=").append(user);
         sb.append(", browser=").append(browser);
         sb.append(", os=").append(os);

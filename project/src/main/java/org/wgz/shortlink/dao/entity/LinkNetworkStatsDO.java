@@ -34,11 +34,6 @@ public class LinkNetworkStatsDO implements Serializable {
     private String fullShortUrl;
 
     /**
-     * 分组标识
-     */
-    private String gid;
-
-    /**
      * 日期
      */
     private Date date;
@@ -85,7 +80,6 @@ public class LinkNetworkStatsDO implements Serializable {
         LinkNetworkStatsDO other = (LinkNetworkStatsDO) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
             && (this.getFullShortUrl() == null ? other.getFullShortUrl() == null : this.getFullShortUrl().equals(other.getFullShortUrl()))
-            && (this.getGid() == null ? other.getGid() == null : this.getGid().equals(other.getGid()))
             && (this.getDate() == null ? other.getDate() == null : this.getDate().equals(other.getDate()))
             && (this.getCnt() == null ? other.getCnt() == null : this.getCnt().equals(other.getCnt()))
             && (this.getNetwork() == null ? other.getNetwork() == null : this.getNetwork().equals(other.getNetwork()))
@@ -100,7 +94,6 @@ public class LinkNetworkStatsDO implements Serializable {
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getFullShortUrl() == null) ? 0 : getFullShortUrl().hashCode());
-        result = prime * result + ((getGid() == null) ? 0 : getGid().hashCode());
         result = prime * result + ((getDate() == null) ? 0 : getDate().hashCode());
         result = prime * result + ((getCnt() == null) ? 0 : getCnt().hashCode());
         result = prime * result + ((getNetwork() == null) ? 0 : getNetwork().hashCode());
@@ -118,7 +111,6 @@ public class LinkNetworkStatsDO implements Serializable {
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
         sb.append(", fullShortUrl=").append(fullShortUrl);
-        sb.append(", gid=").append(gid);
         sb.append(", date=").append(date);
         sb.append(", cnt=").append(cnt);
         sb.append(", network=").append(network);

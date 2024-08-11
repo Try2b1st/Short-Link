@@ -6,7 +6,6 @@
 
     <resultMap id="BaseResultMap" type="org.wgz.shortlink.dao.entity.LinkStatsTodayDO">
             <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="gid" column="gid" jdbcType="VARCHAR"/>
             <result property="fullShortUrl" column="full_short_url" jdbcType="VARCHAR"/>
             <result property="date" column="date" jdbcType="DATE"/>
             <result property="todayPv" column="today_pv" jdbcType="INTEGER"/>
@@ -18,7 +17,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,gid,full_short_url,
+        id,full_short_url,
         date,today_pv,today_uv,
         today_uip,create_time,update_time,
         del_flag

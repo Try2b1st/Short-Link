@@ -26,11 +26,6 @@ public class LinkStatsTodayDO implements Serializable {
     private Long id;
 
     /**
-     * 分组标识
-     */
-    private String gid;
-
-    /**
      * 短链接
      */
     private String fullShortUrl;
@@ -89,7 +84,6 @@ public class LinkStatsTodayDO implements Serializable {
         }
         LinkStatsTodayDO other = (LinkStatsTodayDO) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getGid() == null ? other.getGid() == null : this.getGid().equals(other.getGid()))
             && (this.getFullShortUrl() == null ? other.getFullShortUrl() == null : this.getFullShortUrl().equals(other.getFullShortUrl()))
             && (this.getDate() == null ? other.getDate() == null : this.getDate().equals(other.getDate()))
             && (this.getTodayPv() == null ? other.getTodayPv() == null : this.getTodayPv().equals(other.getTodayPv()))
@@ -105,7 +99,6 @@ public class LinkStatsTodayDO implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getGid() == null) ? 0 : getGid().hashCode());
         result = prime * result + ((getFullShortUrl() == null) ? 0 : getFullShortUrl().hashCode());
         result = prime * result + ((getDate() == null) ? 0 : getDate().hashCode());
         result = prime * result + ((getTodayPv() == null) ? 0 : getTodayPv().hashCode());
@@ -124,7 +117,6 @@ public class LinkStatsTodayDO implements Serializable {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
-        sb.append(", gid=").append(gid);
         sb.append(", fullShortUrl=").append(fullShortUrl);
         sb.append(", date=").append(date);
         sb.append(", todayPv=").append(todayPv);

@@ -27,11 +27,6 @@ public class LinkAccessStatsDO implements Serializable {
     private Long id;
 
     /**
-     * 分组标识
-     */
-    private String gid;
-
-    /**
      * 完整短链接
      */
     private String fullShortUrl;
@@ -101,7 +96,6 @@ public class LinkAccessStatsDO implements Serializable {
         }
         LinkAccessStatsDO other = (LinkAccessStatsDO) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getGid() == null ? other.getGid() == null : this.getGid().equals(other.getGid()))
             && (this.getFullShortUrl() == null ? other.getFullShortUrl() == null : this.getFullShortUrl().equals(other.getFullShortUrl()))
             && (this.getDate() == null ? other.getDate() == null : this.getDate().equals(other.getDate()))
             && (this.getPv() == null ? other.getPv() == null : this.getPv().equals(other.getPv()))
@@ -119,7 +113,6 @@ public class LinkAccessStatsDO implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getGid() == null) ? 0 : getGid().hashCode());
         result = prime * result + ((getFullShortUrl() == null) ? 0 : getFullShortUrl().hashCode());
         result = prime * result + ((getDate() == null) ? 0 : getDate().hashCode());
         result = prime * result + ((getPv() == null) ? 0 : getPv().hashCode());
@@ -140,7 +133,6 @@ public class LinkAccessStatsDO implements Serializable {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
-        sb.append(", gid=").append(gid);
         sb.append(", fullShortUrl=").append(fullShortUrl);
         sb.append(", date=").append(date);
         sb.append(", pv=").append(pv);

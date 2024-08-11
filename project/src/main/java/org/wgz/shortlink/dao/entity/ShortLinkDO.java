@@ -132,6 +132,11 @@ public class ShortLinkDO implements Serializable {
     private Date updateTime;
 
     /**
+     * 删除时间
+     */
+    private Long delTime;
+
+    /**
      * 删除标识 0：未删除 1：已删除
      */
     @TableLogic

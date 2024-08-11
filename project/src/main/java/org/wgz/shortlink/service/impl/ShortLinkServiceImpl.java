@@ -434,7 +434,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                         .uip(uipFirstFlag ? 1 : 0)
                         .hour(hour)
                         .weekday(weekValue)
-                        .gid(gid)
                         .fullShortUrl(fullShortUrl)
                         .date(now)
                         .build();
@@ -459,7 +458,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     String actualCity;
                     linkLocaleStatsDO = LinkLocaleStatsDO.builder()
                             .fullShortUrl(fullShortUrl)
-                            .gid(gid)
                             .province(actualProvince = unknownFlag ? "未知" : province)
                             .city(actualCity = unknownFlag ? "未知" : localeResultObj.getString("city"))
                             .adcode(unknownFlag ? "未知" : localeResultObj.getString("adcode"))
@@ -475,7 +473,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                             .fullShortUrl(fullShortUrl)
                             .date(now)
                             .cnt(1)
-                            .gid(gid)
                             .build();
                     linkOsStatsMapper.upsertLinkOsStats(linkOsStatsDO);
 
@@ -484,7 +481,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     LinkBrowserStatsDO linkBrowserStatsDO = LinkBrowserStatsDO.builder()
                             .browser(browser)
                             .cnt(1)
-                            .gid(gid)
                             .fullShortUrl(fullShortUrl)
                             .date(now)
                             .build();
@@ -495,7 +491,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     LinkDeviceStatsDO linkDeviceStatsDO = LinkDeviceStatsDO.builder()
                             .device(device)
                             .cnt(1)
-                            .gid(gid)
                             .fullShortUrl(fullShortUrl)
                             .date(now)
                             .build();
@@ -506,7 +501,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                     LinkNetworkStatsDO linkNetworkStatsDO = LinkNetworkStatsDO.builder()
                             .network(network)
                             .cnt(1)
-                            .gid(gid)
                             .fullShortUrl(fullShortUrl)
                             .date(now)
                             .build();
@@ -522,7 +516,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                             .network(network)
                             .device(device)
                             .locale(StrUtil.join("-", "中国", actualProvince, actualCity))
-                            .gid(gid)
                             .build();
                     linkAccessLogsMapper.insert(linkAccessLogsDO);
 
@@ -534,7 +527,6 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                             .todayPv(1)
                             .todayUv(uvFirstFlag.get() ? 1 : 0)
                             .todayUip(uipFirstFlag ? 1 : 0)
-                            .gid(gid)
                             .fullShortUrl(fullShortUrl)
                             .date(now)
                             .build();

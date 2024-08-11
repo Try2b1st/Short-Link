@@ -32,11 +32,6 @@ public class LinkLocaleStatsDO implements Serializable {
     private String fullShortUrl;
 
     /**
-     * 分组标识
-     */
-    private String gid;
-
-    /**
      * 日期
      */
     private Date date;
@@ -102,7 +97,6 @@ public class LinkLocaleStatsDO implements Serializable {
         LinkLocaleStatsDO other = (LinkLocaleStatsDO) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
             && (this.getFullShortUrl() == null ? other.getFullShortUrl() == null : this.getFullShortUrl().equals(other.getFullShortUrl()))
-            && (this.getGid() == null ? other.getGid() == null : this.getGid().equals(other.getGid()))
             && (this.getDate() == null ? other.getDate() == null : this.getDate().equals(other.getDate()))
             && (this.getCnt() == null ? other.getCnt() == null : this.getCnt().equals(other.getCnt()))
             && (this.getProvince() == null ? other.getProvince() == null : this.getProvince().equals(other.getProvince()))
@@ -120,7 +114,6 @@ public class LinkLocaleStatsDO implements Serializable {
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getFullShortUrl() == null) ? 0 : getFullShortUrl().hashCode());
-        result = prime * result + ((getGid() == null) ? 0 : getGid().hashCode());
         result = prime * result + ((getDate() == null) ? 0 : getDate().hashCode());
         result = prime * result + ((getCnt() == null) ? 0 : getCnt().hashCode());
         result = prime * result + ((getProvince() == null) ? 0 : getProvince().hashCode());
@@ -141,7 +134,6 @@ public class LinkLocaleStatsDO implements Serializable {
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
         sb.append(", fullShortUrl=").append(fullShortUrl);
-        sb.append(", gid=").append(gid);
         sb.append(", date=").append(date);
         sb.append(", cnt=").append(cnt);
         sb.append(", province=").append(province);
