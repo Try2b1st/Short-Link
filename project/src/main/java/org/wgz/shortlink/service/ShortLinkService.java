@@ -1,13 +1,15 @@
 package org.wgz.shortlink.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import org.wgz.shortlink.dao.entity.ShortLinkDO;
-import com.baomidou.mybatisplus.extension.service.IService;
+import org.wgz.shortlink.dto.req.ShortLinkBatchCreateReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkCreateReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkPageReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkUpdateReqDTO;
+import org.wgz.shortlink.dto.resp.ShortLinkBatchCreateRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkCreateRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkPageRespDTO;
@@ -27,7 +29,15 @@ public interface ShortLinkService extends IService<ShortLinkDO> {
      * @param shortLinkCreateReqDTO 短链接创建请求参数
      * @return 短链接创建信息
      */
-    ShortLinkCreateRespDTO create(ShortLinkCreateReqDTO shortLinkCreateReqDTO);
+    ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO shortLinkCreateReqDTO);
+
+    /**
+     * 批量创建短链接
+     *
+     * @param shortLinkBatchCreateReqDTO 短链接创建请求参数
+     * @return 短链接创建信息实体
+     */
+    ShortLinkBatchCreateRespDTO batchCreateShortLink(ShortLinkBatchCreateReqDTO shortLinkBatchCreateReqDTO);
 
     /**
      * 短链接分页

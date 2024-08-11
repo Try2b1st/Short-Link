@@ -24,8 +24,8 @@ mybatis-plus:
       logic-not-delete-value: 0 # 逻辑未删除值（默认为 0）
 
 short-link:
-  default:
-    domain: wgz.link
+  domain:
+    default: wgz.link:9000
   stats:
     locale:
       amap-key: 7093596fecdf29f5cc3f3dc6cfbbaabd

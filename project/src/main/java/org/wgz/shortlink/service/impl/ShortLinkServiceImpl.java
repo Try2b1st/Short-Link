@@ -40,12 +40,11 @@ import org.wgz.shortlink.common.convention.exception.ServiceException;
 import org.wgz.shortlink.common.enums.VailDateTypeEnum;
 import org.wgz.shortlink.dao.entity.*;
 import org.wgz.shortlink.dao.mapper.*;
+import org.wgz.shortlink.dto.req.ShortLinkBatchCreateReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkCreateReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkPageReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkUpdateReqDTO;
-import org.wgz.shortlink.dto.resp.ShortLinkCreateRespDTO;
-import org.wgz.shortlink.dto.resp.ShortLinkGroupCountQueryRespDTO;
-import org.wgz.shortlink.dto.resp.ShortLinkPageRespDTO;
+import org.wgz.shortlink.dto.resp.*;
 import org.wgz.shortlink.service.ShortLinkService;
 import org.wgz.shortlink.utils.HashUtil;
 import org.wgz.shortlink.utils.LinkUtil;
@@ -97,7 +96,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     private final LinkStatsTodayMapper linkStatsTodayMapper;
 
-    @Value("${short-link.default.domain}")
+    @Value("${short-link.domain.default}")
     private String createShortLinkDefaultDomain;
 
     @Value("${short-link.stats.locale.amap-key}")
@@ -105,7 +104,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public ShortLinkCreateRespDTO create(ShortLinkCreateReqDTO shortLinkCreateReqDTO) {
+    public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO shortLinkCreateReqDTO) {
         String shortLinkSuffix = generateSuffix(shortLinkCreateReqDTO);
         String fullShortUrl = StrBuilder.create(createShortLinkDefaultDomain)
                 .append("/")
@@ -155,6 +154,40 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 .originUrl(shortLinkCreateReqDTO.getOriginUrl())
                 .fullShortUrl("http://" + shortLinkDO.getFullShortUrl())
                 .build();
+    }
+
+    @Override
+    public ShortLinkBatchCreateRespDTO batchCreateShortLink(ShortLinkBatchCreateReqDTO shortLinkBatchCreateReqDTO) {
+        List<String> originUrls = shortLinkBatchCreateReqDTO.getOriginUrls();
+        List<String> describes = shortLinkBatchCreateReqDTO.getDescribes();
+        List<ShortLinkBaseInfoRespDTO> result = new ArrayList<>();
+        for (int i = 0; i < originUrls.size(); i++) {
+            // 构建单个短链接创建请求参数
+            ShortLinkCreateReqDTO current = ShortLinkCreateReqDTO.builder()
+                    .originUrl(originUrls.get(i))
+                    .describe(describes.get(i))
+                    .createdType(shortLinkBatchCreateReqDTO.getCreatedType())
+                    .gid(shortLinkBatchCreateReqDTO.getGid())
+                    .validDateType(shortLinkBatchCreateReqDTO.getValidDateType())
+                    .validDate(shortLinkBatchCreateReqDTO.getValidDate())
+                    .build();
+            try {
+                // 收集短链接创建返回结果
+                ShortLinkCreateRespDTO shortLinkCreateRespDTO = createShortLink(current);
+                ShortLinkBaseInfoRespDTO shortLinkBaseInfoRespDTO = ShortLinkBaseInfoRespDTO.builder()
+                        .fullShortUrl(shortLinkCreateRespDTO.getFullShortUrl())
+                        .originUrl(shortLinkCreateRespDTO.getOriginUrl())
+                        .describe(shortLinkCreateRespDTO.getOriginUrl())
+                        .build();
+                result.add(shortLinkBaseInfoRespDTO);
+            } catch (Exception ex) {
+                log.error("批量创建短链接失败， 原始参数：{}", originUrls.get(i));
+            }
+        }
+        ShortLinkBatchCreateRespDTO shortLinkBatchCreateRespDTO = new ShortLinkBatchCreateRespDTO();
+        shortLinkBatchCreateRespDTO.setBaseLinkInfos(result);
+        shortLinkBatchCreateRespDTO.setTotal(result.size());
+        return shortLinkBatchCreateRespDTO;
     }
 
     @Override
@@ -245,7 +278,12 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     @Override
     public void restoreUrl(String shortUri, ServletRequest request, ServletResponse response) {
         String serverName = request.getServerName();
-        String fullShortUrl = serverName + "/" + shortUri;
+        String serverPort = Optional.of(request.getServerPort())
+                .filter(each -> !Objects.equals(each, 80))
+                .map(String::valueOf)
+                .map(each -> ":" + each)
+                .orElse("");
+        String fullShortUrl = serverName + serverPort + "/" + shortUri;
 
         String NOT_FOUND_URL = "/page/notfound";
 

@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.wgz.shortlink.common.convention.result.Result;
 import org.wgz.shortlink.common.convention.result.Results;
+import org.wgz.shortlink.dto.req.ShortLinkBatchCreateReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkCreateReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkPageReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkUpdateReqDTO;
+import org.wgz.shortlink.dto.resp.ShortLinkBatchCreateRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkCreateRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkPageRespDTO;
@@ -27,9 +29,19 @@ public class ShortLinkController {
      * 新增短链接
      */
     @PostMapping("/api/shortLink/v1/create")
-    public Result<ShortLinkCreateRespDTO> create(@RequestBody ShortLinkCreateReqDTO shortLinkCreateReqDTO) {
-        return Results.success(shortLinkService.create(shortLinkCreateReqDTO));
+    public Result<ShortLinkCreateRespDTO> createShortLink(@RequestBody ShortLinkCreateReqDTO shortLinkCreateReqDTO) {
+        return Results.success(shortLinkService.createShortLink(shortLinkCreateReqDTO));
     }
+
+    /**
+     * 批量创建短链接
+     */
+    @PostMapping("/api/shortLink/v1/create/batch")
+    public Result<ShortLinkBatchCreateRespDTO> batchCreateShortLink(@RequestBody ShortLinkBatchCreateReqDTO shortLinkBatchCreateReqDTO) {
+        return Results.success(shortLinkService.batchCreateShortLink(shortLinkBatchCreateReqDTO));
+    }
+
+
 
     /**
      * 分页查询短链接
