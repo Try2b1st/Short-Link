@@ -1,6 +1,7 @@
 package org.wgz.shortlink.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -25,6 +26,7 @@ import org.wgz.shortlink.admin.dto.resp.UserRespDTO;
 import org.wgz.shortlink.admin.service.GroupService;
 import org.wgz.shortlink.admin.service.UserService;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -110,11 +112,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
         if (userDO == null) {
             throw new ClientException(USER_NULL);
         }
-        Boolean hasLogin = stringRedisTemplate.hasKey("login_" + userLoginReqDTO.getUsername());
-        if (hasLogin != null && hasLogin) {
-            throw new ClientException(USER_IS_LOGIN);
+//        Boolean hasLogin = stringRedisTemplate.hasKey("login_" + userLoginReqDTO.getUsername());
+//        if (hasLogin != null && hasLogin) {
+//            throw new ClientException(USER_IS_LOGIN);
+//        }
+
+        Map<Object, Object> hasLoginMap = stringRedisTemplate.opsForHash().entries("login_" + userLoginReqDTO.getUsername());
+        if (CollUtil.isNotEmpty(hasLoginMap)) {
+            String token = hasLoginMap.keySet().stream()
+                    .findFirst()
+                    .map(Object::toString)
+                    .orElseThrow(() -> new ClientException("用户登录错误"));
+            return new UserLoginRespDTO(token);
         }
 
+        /*
+          Hash
+          Key: login_用户名
+          Value:
+           Key: token标识
+           Value: 用户信息的JSON字符串
+         */
         String uuid = UUID.randomUUID().toString();
         stringRedisTemplate.opsForHash().put("login_" + userLoginReqDTO.getUsername(), uuid, JSON.toJSONString(userDO));
         stringRedisTemplate.expire("login_" + userLoginReqDTO.getUsername(), 30L, TimeUnit.MINUTES);
