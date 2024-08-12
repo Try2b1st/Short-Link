@@ -20,5 +20,11 @@ mybatis-plus:
       logic-not-delete-value: 0 # 逻辑未删除值（默认为 0）
 
 short-link:
+#  设置单个用户最大可创建分组数量
   group:
     max-num: 20
+#  设置流量风控
+  flow-limit:
+    enable: true
+    time-window: 1
+    max-access-count: 3
