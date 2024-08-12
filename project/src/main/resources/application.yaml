@@ -24,8 +24,21 @@ mybatis-plus:
       logic-not-delete-value: 0 # 逻辑未删除值（默认为 0）
 
 short-link:
+#  默认域名
   domain:
     default: wgz.link:9000
+#  允许跳转域名白名单
+  goto-domain:
+    white-list:
+      enable: true
+      names: 'github，知乎,掘金,gitee,知识星球'
+      details:
+        - github.com
+        - zhihu.com
+        - juejin.cn
+        - gitee.com
+        - wx.zsxq.com
+#  高德地图 API key
   stats:
     locale:
       amap-key: 7093596fecdf29f5cc3f3dc6cfbbaabd

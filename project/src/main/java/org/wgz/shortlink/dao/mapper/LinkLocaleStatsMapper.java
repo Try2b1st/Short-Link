@@ -29,7 +29,7 @@ public interface LinkLocaleStatsMapper extends BaseMapper<LinkLocaleStatsDO> {
             "#{linkLocaleStats.city}, " +
             "#{linkLocaleStats.adcode}, NOW(), NOW(), 0) " +
             "ON DUPLICATE KEY UPDATE cnt = cnt +  #{linkLocaleStats.cnt};")
-    void shortLinkLocalStats(@Param("linkLocaleStatsDO") LinkLocaleStatsDO linkLocaleStatsDO);
+    void shortLinkLocalStats(@Param("linkLocaleStats") LinkLocaleStatsDO linkLocaleStatsDO);
 
     /**
      * 根据短链接获取指定日期内基础监控数据

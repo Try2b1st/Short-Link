@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.wgz.shortlink.common.convention.exception.ClientException;
 import org.wgz.shortlink.common.convention.exception.ServiceException;
+import org.wgz.shortlink.config.GotoDomainWhiteListConfiguration;
 import org.wgz.shortlink.dao.entity.*;
 import org.wgz.shortlink.dao.mapper.*;
 import org.wgz.shortlink.dto.biz.ShortLinkStatsRecordDTO;
@@ -47,7 +48,6 @@ import org.wgz.shortlink.dto.req.ShortLinkPageReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkUpdateReqDTO;
 import org.wgz.shortlink.dto.resp.*;
 import org.wgz.shortlink.mq.producer.DelayShortLinkStatsProducer;
-import org.wgz.shortlink.service.LinkStatsTodayService;
 import org.wgz.shortlink.service.ShortLinkService;
 import org.wgz.shortlink.utils.HashUtil;
 import org.wgz.shortlink.utils.LinkUtil;
@@ -100,9 +100,9 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     private final LinkStatsTodayMapper linkStatsTodayMapper;
 
-    private DelayShortLinkStatsProducer delayShortLinkStatsProducer;
+    private final DelayShortLinkStatsProducer delayShortLinkStatsProducer;
 
-    private final LinkStatsTodayService linkStatsTodayService;
+    private final GotoDomainWhiteListConfiguration gotoDomainWhiteListConfiguration;
 
     @Value("${short-link.domain.default}")
     private String createShortLinkDefaultDomain;
@@ -225,8 +225,8 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateShortLink(ShortLinkUpdateReqDTO requestParam) {
-        // TODO 验证原始路径是否可以跳转
-        // verificationWhitelist(requestParam.getOriginUrl());
+//        验证原始链接是否在域名白名单
+        verificationWhitelist(requestParam.getOriginUrl());
 
         LambdaQueryWrapper<ShortLinkDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkDO.class)
                 .eq(ShortLinkDO::getGid, requestParam.getOriginGid())
@@ -326,6 +326,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             stringRedisTemplate.opsForValue().set(String.format(GOTO_SHORT_LINK_KEY, hasShortLinkDO.getShortUri()), requestParam.getOriginUrl());
         }
     }
+
 
     @SneakyThrows
     @Override
@@ -611,6 +612,20 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
             }
         }
         return null;
+    }
+
+    private void verificationWhitelist(String originUrl) {
+        Boolean enable = gotoDomainWhiteListConfiguration.getEnable();
+        if (enable == null || !enable) return;
+
+        String domain = LinkUtil.extractDomain(originUrl);
+        if (StrUtil.isBlank(domain)) {
+            throw new ClientException("跳转的原始链接填写错误");
+        }
+        List<String> whiteList = gotoDomainWhiteListConfiguration.getDetails();
+        if (!whiteList.contains(domain)) {
+            throw new ClientException("演示环境为避免恶意攻击，请生成以下网址跳转链接" + gotoDomainWhiteListConfiguration.getNames());
+        }
     }
 }
 
