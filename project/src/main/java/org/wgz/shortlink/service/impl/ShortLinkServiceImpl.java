@@ -113,6 +113,7 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
     @Transactional(rollbackFor = Exception.class)
     @Override
     public ShortLinkCreateRespDTO createShortLink(ShortLinkCreateReqDTO shortLinkCreateReqDTO) {
+        verificationWhitelist(shortLinkCreateReqDTO.getOriginUrl());
         String shortLinkSuffix = generateSuffix(shortLinkCreateReqDTO);
         String fullShortUrl = StrBuilder.create(createShortLinkDefaultDomain)
                 .append("/")
