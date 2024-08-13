@@ -1,4 +1,4 @@
-package org.wgz.shortlink.mq.producer;
+package org.wgz.shortlink.mq.redis.producer;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;

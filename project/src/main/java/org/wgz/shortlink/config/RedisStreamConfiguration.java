@@ -10,7 +10,7 @@ import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
-import org.wgz.shortlink.mq.consumer.ShortLinkStatsSaveConsumer;
+import org.wgz.shortlink.mq.redis.consumer.ShortLinkStatsSaveConsumer;
 
 import java.time.Duration;
 import java.util.concurrent.ExecutorService;

@@ -1,4 +1,4 @@
-package org.wgz.shortlink.mq.consumer;
+package org.wgz.shortlink.mq.redis.consumer;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.Week;
@@ -24,7 +24,7 @@ import org.wgz.shortlink.dao.entity.*;
 import org.wgz.shortlink.dao.mapper.*;
 import org.wgz.shortlink.dto.biz.ShortLinkStatsRecordDTO;
 import org.wgz.shortlink.handler.MessageQueueIdempotentHandler;
-import org.wgz.shortlink.mq.producer.DelayShortLinkStatsProducer;
+import org.wgz.shortlink.mq.redis.producer.DelayShortLinkStatsProducer;
 
 import java.util.*;
 

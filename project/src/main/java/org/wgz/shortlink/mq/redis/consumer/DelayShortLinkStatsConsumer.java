@@ -1,4 +1,4 @@
-package org.wgz.shortlink.mq.consumer;
+package org.wgz.shortlink.mq.redis.consumer;
 
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RBlockingDeque;

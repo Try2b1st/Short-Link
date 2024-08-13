@@ -45,7 +45,7 @@ import org.wgz.shortlink.dto.req.ShortLinkCreateReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkPageReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkUpdateReqDTO;
 import org.wgz.shortlink.dto.resp.*;
-import org.wgz.shortlink.mq.producer.ShortLinkStatsSaveProducer;
+import org.wgz.shortlink.mq.redis.producer.ShortLinkStatsSaveProducer;
 import org.wgz.shortlink.service.ShortLinkService;
 import org.wgz.shortlink.utils.HashUtil;
 import org.wgz.shortlink.utils.LinkUtil;
