@@ -1,15 +1,11 @@
 package org.wgz.shortlink.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.date.Week;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -39,15 +35,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.wgz.shortlink.common.convention.exception.ClientException;
 import org.wgz.shortlink.common.convention.exception.ServiceException;
 import org.wgz.shortlink.config.GotoDomainWhiteListConfiguration;
-import org.wgz.shortlink.dao.entity.*;
-import org.wgz.shortlink.dao.mapper.*;
+import org.wgz.shortlink.dao.entity.ShortLinkDO;
+import org.wgz.shortlink.dao.entity.ShortLinkGotoDO;
+import org.wgz.shortlink.dao.mapper.ShortLinkGotoMapper;
+import org.wgz.shortlink.dao.mapper.ShortLinkMapper;
 import org.wgz.shortlink.dto.biz.ShortLinkStatsRecordDTO;
 import org.wgz.shortlink.dto.req.ShortLinkBatchCreateReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkCreateReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkPageReqDTO;
 import org.wgz.shortlink.dto.req.ShortLinkUpdateReqDTO;
 import org.wgz.shortlink.dto.resp.*;
-import org.wgz.shortlink.mq.producer.DelayShortLinkStatsProducer;
+import org.wgz.shortlink.mq.producer.ShortLinkStatsSaveProducer;
 import org.wgz.shortlink.service.ShortLinkService;
 import org.wgz.shortlink.utils.HashUtil;
 import org.wgz.shortlink.utils.LinkUtil;
@@ -60,7 +58,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.wgz.shortlink.common.constant.RedisKeyConstant.*;
-import static org.wgz.shortlink.common.constant.ShortLinkConstant.AMAP_REMOTE_URL;
 import static org.wgz.shortlink.common.enums.VailDateTypeEnum.PERMANENT;
 
 /**
@@ -76,33 +73,15 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
 
     private final RBloomFilter<String> shortUriCreateCachePenetrationBloomFilter;
 
-    private final ShortLinkMapper shortLinkMapper;
-
     private final ShortLinkGotoMapper shortLinkGotoMapper;
 
     private final StringRedisTemplate stringRedisTemplate;
 
     private final RedissonClient redissonClient;
 
-    private final LinkAccessStatsMapper linkAccessStatsMapper;
-
-    private final LinkLocaleStatsMapper linkLocaleStatsMapper;
-
-    private final LinkOsStatsMapper linkOsStatsMapper;
-
-    private final LinkBrowserStatsMapper linkBrowserStatsMapper;
-
-    private final LinkAccessLogsMapper linkAccessLogsMapper;
-
-    private final LinkDeviceStatsMapper linkDeviceStatsMapper;
-
-    private final LinkNetworkStatsMapper linkNetworkStatsMapper;
-
-    private final LinkStatsTodayMapper linkStatsTodayMapper;
-
-    private final DelayShortLinkStatsProducer delayShortLinkStatsProducer;
-
     private final GotoDomainWhiteListConfiguration gotoDomainWhiteListConfiguration;
+
+    private final ShortLinkStatsSaveProducer shortLinkStatsSaveProducer;
 
     @Value("${short-link.domain.default}")
     private String createShortLinkDefaultDomain;
@@ -372,11 +351,12 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
                 return;
             }
 
-//            if (StrUtil.isNotBlank(
-//                    stringRedisTemplate.opsForValue().get(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl)))) {
-//                ((HttpServletResponse) response).sendRedirect(NOT_FOUND_URL);
-//                return;
-//            }
+            // 防止缓存击穿
+            if (StrUtil.isNotBlank(
+                    stringRedisTemplate.opsForValue().get(String.format(GOTO_IS_NULL_SHORT_LINK_KEY, fullShortUrl)))) {
+                ((HttpServletResponse) response).sendRedirect(NOT_FOUND_URL);
+                return;
+            }
 
             LambdaQueryWrapper<ShortLinkGotoDO> linkGotoQueryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
                     .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
@@ -464,120 +444,12 @@ public class ShortLinkServiceImpl extends ServiceImpl<ShortLinkMapper, ShortLink
      * 短链接跳转统计
      */
     public void shortLinkStats(String fullShortUrl, String gid, ShortLinkStatsRecordDTO statsRecord) {
-        fullShortUrl = Optional.ofNullable(fullShortUrl).orElse(statsRecord.getFullShortUrl());
-        RReadWriteLock readWriteLock = redissonClient.getReadWriteLock(String.format(LOCK_GID_UPDATE_KEY, fullShortUrl));
-        RLock rLock = readWriteLock.readLock();
-        if (!rLock.tryLock()) {
-            delayShortLinkStatsProducer.send(statsRecord);
-            return;
-        }
-        try {
-            //记录当前时间
-            Date now = new Date();
-            if (StrUtil.isBlank(gid)) {
-                LambdaQueryWrapper<ShortLinkGotoDO> queryWrapper = Wrappers.lambdaQuery(ShortLinkGotoDO.class)
-                        .eq(ShortLinkGotoDO::getFullShortUrl, fullShortUrl);
-                ShortLinkGotoDO shortLinkGotoDO = shortLinkGotoMapper.selectOne(queryWrapper);
-                gid = shortLinkGotoDO.getGid();
-
-                int hour = DateUtil.hour(now, true);
-                Week week = DateUtil.dayOfWeekEnum(now);
-                int weekValue = week.getIso8601Value();
-                LinkAccessStatsDO linkAccessStatsDO = LinkAccessStatsDO.builder()
-                        .pv(1)
-                        .uv(statsRecord.getUvFirstFlag() ? 1 : 0)
-                        .uip(statsRecord.getUipFirstFlag() ? 1 : 0)
-                        .hour(hour)
-                        .weekday(weekValue)
-                        .fullShortUrl(fullShortUrl)
-                        .date(now)
-                        .build();
-                linkAccessStatsMapper.insertOrUpdateToStats(linkAccessStatsDO);
-
-                // 通过高德地图的IP定位API
-                Map<String, Object> localeParamMap = new HashMap<>();
-                localeParamMap.put("key", statsLocaleAmapKey);
-                localeParamMap.put("ip", statsRecord.getRemoteAddr());
-                String localeResultStr = HttpUtil.get(AMAP_REMOTE_URL, localeParamMap);
-                JSONObject localeResultObj = JSON.parseObject(localeResultStr);
-
-                LinkLocaleStatsDO linkLocaleStatsDO;
-                String infoCode = localeResultObj.getString("infocode");
-                String actualProvince = "未知";
-                String actualCity = "未知";
-                if (StrUtil.isNotBlank(infoCode) && StrUtil.equals(infoCode, "10000")) {
-                    String province = localeResultObj.getString("province");
-                    boolean unknownFlag = StrUtil.equals(province, "[]");
-
-                    // 记录IP地区位置
-                    linkLocaleStatsDO = LinkLocaleStatsDO.builder()
-                            .fullShortUrl(fullShortUrl)
-                            .province(actualProvince = unknownFlag ? actualProvince : province)
-                            .city(actualCity = unknownFlag ? actualCity : localeResultObj.getString("city"))
-                            .adcode(unknownFlag ? "未知" : localeResultObj.getString("adcode"))
-                            .date(now)
-                            .cnt(1)
-                            .build();
-                    linkLocaleStatsMapper.shortLinkLocalStats(linkLocaleStatsDO);
-                }
-                LinkOsStatsDO linkOsStatsDO = LinkOsStatsDO.builder()
-                        .os(statsRecord.getOs())
-                        .cnt(1)
-                        .fullShortUrl(fullShortUrl)
-                        .date(new Date())
-                        .build();
-                linkOsStatsMapper.upsertLinkOsStats(linkOsStatsDO);
-
-                LinkBrowserStatsDO linkBrowserStatsDO = LinkBrowserStatsDO.builder()
-                        .browser(statsRecord.getBrowser())
-                        .cnt(1)
-                        .fullShortUrl(fullShortUrl)
-                        .date(new Date())
-                        .build();
-                linkBrowserStatsMapper.shortLinkBrowserState(linkBrowserStatsDO);
-
-                LinkDeviceStatsDO linkDeviceStatsDO = LinkDeviceStatsDO.builder()
-                        .device(statsRecord.getDevice())
-                        .cnt(1)
-                        .fullShortUrl(fullShortUrl)
-                        .date(new Date())
-                        .build();
-                linkDeviceStatsMapper.shortLinkDeviceState(linkDeviceStatsDO);
-
-                LinkNetworkStatsDO linkNetworkStatsDO = LinkNetworkStatsDO.builder()
-                        .network(statsRecord.getNetwork())
-                        .cnt(1)
-                        .fullShortUrl(fullShortUrl)
-                        .date(new Date())
-                        .build();
-                linkNetworkStatsMapper.shortLinkNetworkState(linkNetworkStatsDO);
-
-                LinkAccessLogsDO linkAccessLogsDO = LinkAccessLogsDO.builder()
-                        .user(statsRecord.getUv())
-                        .ip(statsRecord.getRemoteAddr())
-                        .browser(statsRecord.getBrowser())
-                        .os(statsRecord.getOs())
-                        .network(statsRecord.getNetwork())
-                        .device(statsRecord.getDevice())
-                        .locale(StrUtil.join("-", "中国", actualProvince, actualCity))
-                        .fullShortUrl(fullShortUrl)
-                        .build();
-                linkAccessLogsMapper.insert(linkAccessLogsDO);
-
-                baseMapper.incrementStats(gid, fullShortUrl, 1, statsRecord.getUvFirstFlag() ? 1 : 0, statsRecord.getUipFirstFlag() ? 1 : 0);
-
-                LinkStatsTodayDO linkStatsTodayDO = LinkStatsTodayDO.builder()
-                        .todayPv(1)
-                        .todayUv(statsRecord.getUvFirstFlag() ? 1 : 0)
-                        .todayUip(statsRecord.getUipFirstFlag() ? 1 : 0)
-                        .fullShortUrl(fullShortUrl)
-                        .date(new Date())
-                        .build();
-                linkStatsTodayMapper.shortLinkTodayState(linkStatsTodayDO);
-            }
-        } catch (Throwable ex) {
-            log.error("短链接访问量统计异常", ex);
-        }
+        // 发送消息
+        Map<String, String> producerMap = new HashMap<>();
+        producerMap.put("fullShortUrl", fullShortUrl);
+        producerMap.put("gid", gid);
+        producerMap.put("statsRecord", JSON.toJSONString(statsRecord));
+        shortLinkStatsSaveProducer.send(producerMap);
     }
 
     private String generateSuffix(ShortLinkCreateReqDTO requestParam) {

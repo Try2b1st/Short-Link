@@ -1,5 +1,6 @@
 package org.wgz.shortlink.controller;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -15,9 +16,12 @@ import org.wgz.shortlink.dto.resp.ShortLinkBatchCreateRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkCreateRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.wgz.shortlink.dto.resp.ShortLinkPageRespDTO;
+import org.wgz.shortlink.handler.CustomBlockHandler;
 import org.wgz.shortlink.service.ShortLinkService;
 
 import java.util.List;
+
+import static org.wgz.shortlink.common.constant.SentinelRuleConstant.CREATE_SHORT_LINK_RULE;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +33,11 @@ public class ShortLinkController {
      * 新增短链接
      */
     @PostMapping("/api/shortLink/v1/create")
+    @SentinelResource(
+            value = CREATE_SHORT_LINK_RULE,
+            blockHandler = "createShortLinkBlockHandlerMethod",
+            blockHandlerClass = CustomBlockHandler.class
+    )
     public Result<ShortLinkCreateRespDTO> createShortLink(@RequestBody ShortLinkCreateReqDTO shortLinkCreateReqDTO) {
         return Results.success(shortLinkService.createShortLink(shortLinkCreateReqDTO));
     }
@@ -40,7 +49,6 @@ public class ShortLinkController {
     public Result<ShortLinkBatchCreateRespDTO> batchCreateShortLink(@RequestBody ShortLinkBatchCreateReqDTO shortLinkBatchCreateReqDTO) {
         return Results.success(shortLinkService.batchCreateShortLink(shortLinkBatchCreateReqDTO));
     }
-
 
 
     /**
