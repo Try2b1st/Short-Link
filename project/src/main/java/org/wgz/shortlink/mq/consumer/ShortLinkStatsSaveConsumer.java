@@ -19,9 +19,11 @@ import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.stereotype.Component;
+import org.wgz.shortlink.common.convention.exception.ServiceException;
 import org.wgz.shortlink.dao.entity.*;
 import org.wgz.shortlink.dao.mapper.*;
 import org.wgz.shortlink.dto.biz.ShortLinkStatsRecordDTO;
+import org.wgz.shortlink.handler.MessageQueueIdempotentHandler;
 import org.wgz.shortlink.mq.producer.DelayShortLinkStatsProducer;
 
 import java.util.*;
@@ -35,18 +37,33 @@ import static org.wgz.shortlink.common.constant.ShortLinkConstant.AMAP_REMOTE_UR
 public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRecord<String, String, String>> {
 
     private final ShortLinkMapper shortLinkMapper;
+
     private final ShortLinkGotoMapper shortLinkGotoMapper;
+
     private final RedissonClient redissonClient;
+
     private final LinkAccessStatsMapper linkAccessStatsMapper;
+
     private final LinkLocaleStatsMapper linkLocaleStatsMapper;
+
     private final LinkOsStatsMapper linkOsStatsMapper;
+
     private final LinkBrowserStatsMapper linkBrowserStatsMapper;
+
     private final LinkAccessLogsMapper linkAccessLogsMapper;
+
     private final LinkDeviceStatsMapper linkDeviceStatsMapper;
+
     private final LinkNetworkStatsMapper linkNetworkStatsMapper;
+
     private final LinkStatsTodayMapper linkStatsTodayMapper;
+
     private final DelayShortLinkStatsProducer delayShortLinkStatsProducer;
+
     private final StringRedisTemplate stringRedisTemplate;
+
+    private final MessageQueueIdempotentHandler messageQueueIdempotentHandler;
+
 
     @Value("${short-link.stats.locale.amap-key}")
     private String statsLocaleAmapKey;
@@ -55,14 +72,30 @@ public class ShortLinkStatsSaveConsumer implements StreamListener<String, MapRec
     public void onMessage(MapRecord<String, String, String> message) {
         String stream = message.getStream();
         RecordId id = message.getId();
-        Map<String, String> producerMap = message.getValue();
-        String fullShortUrl = producerMap.get("fullShortUrl");
-        if (StrUtil.isNotBlank(fullShortUrl)) {
-            String gid = producerMap.get("gid");
-            ShortLinkStatsRecordDTO statsRecord = JSON.parseObject(producerMap.get("statsRecord"), ShortLinkStatsRecordDTO.class);
-            actualSaveShortLinkStats(fullShortUrl, gid, statsRecord);
+
+        if (!messageQueueIdempotentHandler.isMessageProcessed(id.toString())) {
+            if (!messageQueueIdempotentHandler.isAccomplish(id.toString())) {
+                return;
+            }
+            throw new ServiceException("消息未完成流程，需要消息队列重试");
         }
-        stringRedisTemplate.opsForStream().delete(Objects.requireNonNull(stream), id.getValue());
+        try {
+            Map<String, String> producerMap = message.getValue();
+            String fullShortUrl = producerMap.get("fullShortUrl");
+            if (StrUtil.isNotBlank(fullShortUrl)) {
+                String gid = producerMap.get("gid");
+                ShortLinkStatsRecordDTO statsRecord = JSON.parseObject(producerMap.get("statsRecord"), ShortLinkStatsRecordDTO.class);
+                actualSaveShortLinkStats(fullShortUrl, gid, statsRecord);
+            }
+            stringRedisTemplate.opsForStream().delete(Objects.requireNonNull(stream), id.getValue());
+            messageQueueIdempotentHandler.setAccomplish(id.toString());
+
+        } catch (Throwable throwable) {
+            // 某某某情况宕机了
+            messageQueueIdempotentHandler.delMessageProcessed(id.toString());
+            log.error("记录短链接监控消费异常", throwable);
+        }
+        messageQueueIdempotentHandler.setAccomplish(id.toString());
     }
 
     public void actualSaveShortLinkStats(String fullShortUrl, String gid, ShortLinkStatsRecordDTO statsRecord) {
