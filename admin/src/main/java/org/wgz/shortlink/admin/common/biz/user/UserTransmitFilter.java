@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+import static org.wgz.shortlink.admin.common.constant.RedisCacheConstant.USER_LOGIN_KEY;
 import static org.wgz.shortlink.admin.common.enums.UserErrorCodeEnums.USER_TOKEN_FAIL;
 
 /**
@@ -42,7 +43,7 @@ public class UserTransmitFilter implements Filter {
                 }
                 Object userInfoJsonStr;
                 try {
-                    userInfoJsonStr = stringRedisTemplate.opsForHash().get("login_" + username, token);
+                    userInfoJsonStr = stringRedisTemplate.opsForHash().get(USER_LOGIN_KEY + username, token);
                     if (userInfoJsonStr == null) {
                         // TODO 网关响应前端
                         throw new ClientException(USER_TOKEN_FAIL);
