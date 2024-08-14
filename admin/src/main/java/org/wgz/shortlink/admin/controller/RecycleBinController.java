@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.wgz.shortlink.admin.common.convention.result.Result;
 import org.wgz.shortlink.admin.common.convention.result.Results;
-import org.wgz.shortlink.admin.remote.ShortLinkRemoteService;
+import org.wgz.shortlink.admin.remote.ShortLinkActualRemoteService;
 import org.wgz.shortlink.admin.remote.dto.req.RecycleBinRecoverReqDTO;
 import org.wgz.shortlink.admin.remote.dto.req.RecycleBinRemoveReqDTO;
 import org.wgz.shortlink.admin.remote.dto.req.RecycleBinSaveReqDTO;
@@ -20,12 +20,12 @@ public class RecycleBinController {
 
     private final RecycleBinService recycleBinService;
 
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
-    };
+    private final ShortLinkActualRemoteService shortLinkActualRemoteService;
+
 
     @PostMapping("/v1/recycle-bin/save")
     public Result<Void> saveRecycleBin(@RequestBody RecycleBinSaveReqDTO recycleBinSaveReqDTO) {
-        shortLinkRemoteService.saveRecycleBin(recycleBinSaveReqDTO);
+        shortLinkActualRemoteService.saveRecycleBin(recycleBinSaveReqDTO);
         return Results.success();
     }
 
@@ -42,7 +42,7 @@ public class RecycleBinController {
      */
     @PostMapping("/v1/recycle-bin/recover")
     public Result<Void> recoverRecycleBin(@RequestBody RecycleBinRecoverReqDTO recycleBinRecoverReqDTO) {
-        shortLinkRemoteService.recoverRecycleBin(recycleBinRecoverReqDTO);
+        shortLinkActualRemoteService.recoverRecycleBin(recycleBinRecoverReqDTO);
         return Results.success();
     }
 
@@ -51,7 +51,7 @@ public class RecycleBinController {
      */
     @PostMapping("/v1/recycle-bin/remove")
     public Result<Void> removeRecycleBin(@RequestBody RecycleBinRemoveReqDTO recycleBinRemoveReqDTO) {
-        shortLinkRemoteService.removeRecycleBin(recycleBinRemoveReqDTO);
+        shortLinkActualRemoteService.removeRecycleBin(recycleBinRemoveReqDTO);
         return Results.success();
     }
 }

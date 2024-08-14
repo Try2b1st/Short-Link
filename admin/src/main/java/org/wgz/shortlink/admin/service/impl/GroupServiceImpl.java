@@ -20,7 +20,7 @@ import org.wgz.shortlink.admin.dao.mapper.GroupMapper;
 import org.wgz.shortlink.admin.dto.req.ShortLinkGroupSortReqDTO;
 import org.wgz.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import org.wgz.shortlink.admin.dto.resp.ShortLinkGroupListRespDTO;
-import org.wgz.shortlink.admin.remote.ShortLinkRemoteService;
+import org.wgz.shortlink.admin.remote.ShortLinkActualRemoteService;
 import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkGroupCountQueryRespDTO;
 import org.wgz.shortlink.admin.service.GroupService;
 import org.wgz.shortlink.admin.util.RandomStringGenerator;
@@ -47,8 +47,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO>
     @Value("${short-link.group.max-num}")
     private Integer groupMaxNum;
 
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
-    };
+    private final ShortLinkActualRemoteService shortLinkActualRemoteService;
 
     @Override
     public void saveGroup(String groupName) {
@@ -90,7 +89,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO>
                 .orderByDesc(GroupDO::getUpdateTime);
         List<GroupDO> groupDOS = baseMapper.selectList(queryWrapper);
 
-        Result<List<ShortLinkGroupCountQueryRespDTO>> listResult = shortLinkRemoteService.listGroupShortLinkCount(
+        Result<List<ShortLinkGroupCountQueryRespDTO>> listResult = shortLinkActualRemoteService.listGroupShortLinkCount(
                 groupDOS.stream().map(GroupDO::getGid).toList()
         );
 

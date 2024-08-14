@@ -38,8 +38,8 @@ public class ShortLinkController {
             blockHandler = "createShortLinkBlockHandlerMethod",
             blockHandlerClass = CustomBlockHandler.class
     )
-    public Result<ShortLinkCreateRespDTO> createShortLink(@RequestBody ShortLinkCreateReqDTO shortLinkCreateReqDTO) {
-        return Results.success(shortLinkService.createShortLink(shortLinkCreateReqDTO));
+    public Result<ShortLinkCreateRespDTO> createShortLink(@RequestBody ShortLinkCreateReqDTO requestParam) {
+        return Results.success(shortLinkService.createShortLink(requestParam));
     }
 
     /**

@@ -44,7 +44,7 @@ public class UserFlowRiskControlFilter implements Filter {
 
         try {
             //执行lua脚本
-            result = stringRedisTemplate.execute(redisScript, Lists.newArrayList(username), userFlowRiskControlConfiguration.getMaxAccessCount());
+            result = stringRedisTemplate.execute(redisScript, Lists.newArrayList(username), userFlowRiskControlConfiguration.getTimeWindow());
 
         } catch (Throwable throwable) {
             log.error("执行用户请求流量限制LUA脚本出错", throwable);

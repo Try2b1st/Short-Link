@@ -11,7 +11,7 @@ import org.wgz.shortlink.admin.common.convention.exception.ClientException;
 import org.wgz.shortlink.admin.common.convention.result.Result;
 import org.wgz.shortlink.admin.dao.entity.GroupDO;
 import org.wgz.shortlink.admin.dao.mapper.GroupMapper;
-import org.wgz.shortlink.admin.remote.ShortLinkRemoteService;
+import org.wgz.shortlink.admin.remote.ShortLinkActualRemoteService;
 import org.wgz.shortlink.admin.remote.dto.req.ShortLinkRecycleBinPageReqDTO;
 import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import org.wgz.shortlink.admin.service.RecycleBinService;
@@ -23,8 +23,8 @@ import java.util.List;
 public class RecycleBinServiceImpl implements RecycleBinService {
 
     private final GroupMapper groupMapper;
-    ShortLinkRemoteService shortLinkRemoteService = new ShortLinkRemoteService() {
-    };
+
+    private final ShortLinkActualRemoteService shortLinkActualRemoteService;
 
     @Override
     public Result<IPage<ShortLinkPageRespDTO>> pageRecycleBinShortLink(ShortLinkRecycleBinPageReqDTO shortLinkRecycleBinPageReqDTO) {
@@ -36,6 +36,6 @@ public class RecycleBinServiceImpl implements RecycleBinService {
             throw new ClientException("用户没有分组信息");
         }
         shortLinkRecycleBinPageReqDTO.setGidList(groupDOList.stream().map(GroupDO::getGid).toList());
-        return shortLinkRemoteService.pageRecycleBinShortLink(shortLinkRecycleBinPageReqDTO);
+        return shortLinkActualRemoteService.pageRecycleBinShortLink(shortLinkRecycleBinPageReqDTO);
     }
 }
