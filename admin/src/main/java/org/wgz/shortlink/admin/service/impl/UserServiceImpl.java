@@ -14,6 +14,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.wgz.shortlink.admin.common.biz.user.UserContext;
 import org.wgz.shortlink.admin.common.convention.exception.ClientException;
 import org.wgz.shortlink.admin.common.enums.UserErrorCodeEnums;
 import org.wgz.shortlink.admin.dao.entity.UserDO;
@@ -27,6 +28,7 @@ import org.wgz.shortlink.admin.service.GroupService;
 import org.wgz.shortlink.admin.service.UserService;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -98,6 +100,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
     @Override
     public void update(UserUpdateReqDTO userUpdateReqDTO) {
         // TODO 验证修改用户是否为当前登录用户
+        if (!Objects.equals(UserContext.getUsername(), userUpdateReqDTO.getUsername())) {
+            throw new ClientException("修改用户不是当前用户");
+        }
         LambdaUpdateWrapper<UserDO> updateWrapper = Wrappers
                 .lambdaUpdate(UserDO.class)
                 .eq(UserDO::getUsername, userUpdateReqDTO.getUsername());
