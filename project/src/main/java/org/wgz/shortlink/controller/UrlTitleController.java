@@ -11,9 +11,9 @@ import org.wgz.shortlink.service.UrlTitleService;
 @RestController
 @RequiredArgsConstructor
 public class UrlTitleController {
-    private UrlTitleService urlTitleService;
+    private final UrlTitleService urlTitleService;
 
-    @GetMapping("/api/shortLink/v1/title")
+    @GetMapping("/api/short-link/v1/title")
     public Result<String> getTitleByUrl(@RequestParam("url") String url) {
         return Results.success(urlTitleService.getTitleByUrl(url));
     }

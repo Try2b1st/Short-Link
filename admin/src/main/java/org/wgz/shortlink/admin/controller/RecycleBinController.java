@@ -14,7 +14,7 @@ import org.wgz.shortlink.admin.remote.dto.resp.ShortLinkPageRespDTO;
 import org.wgz.shortlink.admin.service.RecycleBinService;
 
 @RestController
-@RequestMapping("/api/shortLink/admin")
+@RequestMapping("/api/short-link/admin")
 @RequiredArgsConstructor
 public class RecycleBinController {
 

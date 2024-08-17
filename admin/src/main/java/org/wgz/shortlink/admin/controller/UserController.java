@@ -18,7 +18,7 @@ import org.wgz.shortlink.admin.service.UserService;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/shortLink/admin")
+@RequestMapping("/api/short-link/admin")
 public class UserController {
 
     private final UserService userService;

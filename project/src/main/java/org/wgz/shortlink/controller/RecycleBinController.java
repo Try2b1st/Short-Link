@@ -13,7 +13,7 @@ import org.wgz.shortlink.dto.resp.ShortLinkPageRespDTO;
 import org.wgz.shortlink.service.RecycleBinService;
 
 @RestController
-@RequestMapping("/api/shortLink")
+@RequestMapping("/api/short-link")
 @RequiredArgsConstructor
 public class RecycleBinController {
 

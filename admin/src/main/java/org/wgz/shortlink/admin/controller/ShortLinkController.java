@@ -21,7 +21,7 @@ import org.wgz.shortlink.admin.util.EasyExcelWebUtil;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/shortLink/admin")
+@RequestMapping("/api/short-link/admin")
 @RequiredArgsConstructor
 public class ShortLinkController {
 

@@ -32,7 +32,7 @@ public class ShortLinkController {
     /**
      * 新增短链接
      */
-    @PostMapping("/api/shortLink/v1/create")
+    @PostMapping("/api/short-link/v1/create")
     @SentinelResource(
             value = CREATE_SHORT_LINK_RULE,
             blockHandler = "createShortLinkBlockHandlerMethod",
@@ -45,7 +45,7 @@ public class ShortLinkController {
     /**
      * 批量创建短链接
      */
-    @PostMapping("/api/shortLink/v1/create/batch")
+    @PostMapping("/api/short-link/v1/create/batch")
     public Result<ShortLinkBatchCreateRespDTO> batchCreateShortLink(@RequestBody ShortLinkBatchCreateReqDTO shortLinkBatchCreateReqDTO) {
         return Results.success(shortLinkService.batchCreateShortLink(shortLinkBatchCreateReqDTO));
     }
@@ -54,7 +54,7 @@ public class ShortLinkController {
     /**
      * 分页查询短链接
      */
-    @GetMapping("/api/shortLink/v1/page")
+    @GetMapping("/api/short-link/v1/page")
     public Result<IPage<ShortLinkPageRespDTO>> pageShortLink(ShortLinkPageReqDTO shortLinkPageReqDTO) {
         return Results.success(shortLinkService.pageShortLink(shortLinkPageReqDTO));
     }
@@ -62,7 +62,7 @@ public class ShortLinkController {
     /**
      * 系统内部调用：查看分组下短链接数目
      */
-    @GetMapping("/api/shortLink/v1/count")
+    @GetMapping("/api/short-link/v1/count")
     public Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("requestParam") List<String> requestParam) {
         return Results.success(shortLinkService.listGroupShortLinkCount(requestParam));
     }
@@ -70,7 +70,7 @@ public class ShortLinkController {
     /**
      * 短链接修改
      */
-    @PostMapping("/api/shortLink/v1/update")
+    @PostMapping("/api/short-link/v1/update")
     public Result<Void> updateShortLink(@RequestBody ShortLinkUpdateReqDTO shortLinkUpdateReqDTO) {
         shortLinkService.updateShortLink(shortLinkUpdateReqDTO);
         return Results.success();

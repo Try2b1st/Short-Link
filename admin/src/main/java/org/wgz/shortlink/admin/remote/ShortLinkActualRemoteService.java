@@ -27,7 +27,7 @@ public interface ShortLinkActualRemoteService {
      * @param requestParam 创建短链接请求参数
      * @return 创建返回参数
      */
-    @PostMapping("/api/shortLink/v1/create")
+    @PostMapping("/api/short-link/v1/create")
     Result<ShortLinkCreateRespDTO> create(@RequestBody ShortLinkCreateReqDTO requestParam);
 
     /**
@@ -36,7 +36,7 @@ public interface ShortLinkActualRemoteService {
      * @param requestParam 批量创建短链接请求参数
      * @return 短链接批量创建响应
      */
-    @PostMapping("/api/shortLink/v1/create/batch")
+    @PostMapping("/api/short-link/v1/create/batch")
     Result<ShortLinkBatchCreateRespDTO> batchCreateShortLink(@RequestBody ShortLinkBatchCreateReqDTO requestParam);
 
     /**
@@ -44,7 +44,7 @@ public interface ShortLinkActualRemoteService {
      *
      * @param shortLinkUpdateReqDTO 修改短链接请求参数
      */
-    @PostMapping("/api/shortLink/v1/update")
+    @PostMapping("/api/short-link/v1/update")
     void updateShortLink(@RequestBody ShortLinkUpdateReqDTO shortLinkUpdateReqDTO);
 
     /**
@@ -56,7 +56,7 @@ public interface ShortLinkActualRemoteService {
      * @param size     页大小
      * @return 分页结果
      */
-    @GetMapping("/api/shortLink/v1/page")
+    @GetMapping("/api/short-link/v1/page")
     Result<Page<ShortLinkPageRespDTO>> pageShortLink(@RequestParam("gid") String gid,
                                                      @RequestParam("orderTag") String orderTag,
                                                      @RequestParam("current") Long current,
@@ -68,7 +68,7 @@ public interface ShortLinkActualRemoteService {
      * @param requestParam gid列表请求参数
      * @return 响应参数
      */
-    @GetMapping("/api/shortLink/v1/count")
+    @GetMapping("/api/short-link/v1/count")
     Result<List<ShortLinkGroupCountQueryRespDTO>> listGroupShortLinkCount(@RequestParam("requestParam") List<String> requestParam);
 
     /**
@@ -77,13 +77,13 @@ public interface ShortLinkActualRemoteService {
      * @param url 网址
      * @return 网站标题
      */
-    @GetMapping("/api/shortLink/v1/title?url=")
+    @GetMapping("/api/short-link/v1/title?url=")
     Result<String> getTitleByUrl(@RequestParam("url") String url);
 
     /**
      * 短链接移至回收站
      */
-    @PostMapping("/api/shortLink/v1/recycle-bin/save")
+    @PostMapping("/api/short-link/v1/recycle-bin/save")
     void saveRecycleBin(@RequestBody RecycleBinSaveReqDTO recycleBinSaveReqDTO);
 
     /**
@@ -92,7 +92,7 @@ public interface ShortLinkActualRemoteService {
      * @param shortLinkRecycleBinPageReqDTO 查询参数
      * @return 短链接数据列表
      */
-    @GetMapping("/api/shortLink/v1/recycle-bin/page")
+    @GetMapping("/api/short-link/v1/recycle-bin/page")
     Result<IPage<ShortLinkPageRespDTO>> pageRecycleBinShortLink(@SpringQueryMap ShortLinkRecycleBinPageReqDTO shortLinkRecycleBinPageReqDTO);
 
     /**
@@ -100,7 +100,7 @@ public interface ShortLinkActualRemoteService {
      *
      * @param recycleBinRecoverReqDTO 恢复短链接请求参数
      */
-    @PostMapping("/api/shortLink/v1/recycle-bin/recover")
+    @PostMapping("/api/short-link/v1/recycle-bin/recover")
     void recoverRecycleBin(@RequestBody RecycleBinRecoverReqDTO recycleBinRecoverReqDTO);
 
     /**
@@ -108,7 +108,7 @@ public interface ShortLinkActualRemoteService {
      *
      * @param recycleBinRemoveReqDTO 移除短链接请求参数
      */
-    @PostMapping("/api/shortLink/v1/recycle-bin/remove")
+    @PostMapping("/api/short-link/v1/recycle-bin/remove")
     void removeRecycleBin(@RequestBody RecycleBinRemoveReqDTO recycleBinRemoveReqDTO);
 
     @GetMapping("/api/short-link/v1/stats")
@@ -123,10 +123,22 @@ public interface ShortLinkActualRemoteService {
     @GetMapping("/api/short-link/v1/stats/group")
     Result<ShortLinkStatsRespDTO> groupShortLinkStats(@SpringQueryMap ShortLinkGroupStatsReqDTO requestParam);
 
+    /**
+     * 获取单个短链接的日志记录
+     *
+     * @param requestParam 请求参数
+     * @return 日志记录
+     */
     @GetMapping("/api/short-link/v1/stats/access-record")
     Result<Page<ShortLinkStatsAccessRecordRespDTO>> shortLinkStatsAccessRecord(
             @SpringQueryMap ShortLinkStatsAccessRecordReqDTO requestParam);
 
+    /**
+     * 获取短链接分组的日志记录
+     *
+     * @param requestParam 请求参数
+     * @return 日志记录
+     */
     @GetMapping("/api/short-link/v1/stats/access-record/group")
     Result<Page<ShortLinkStatsAccessRecordRespDTO>> groupShortLinkStatsAccessRecord(
             @SpringQueryMap ShortLinkGroupStatsAccessRecordReqDTO requestParam);
