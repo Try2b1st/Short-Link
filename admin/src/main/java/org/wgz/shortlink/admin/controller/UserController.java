@@ -71,7 +71,6 @@ public class UserController {
      */
     @PostMapping("/v1/user/login")
     public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO userLoginReqDTO) {
-        System.out.println(userLoginReqDTO);
         return Results.success(userService.login(userLoginReqDTO));
     }
 

@@ -113,13 +113,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
         if (userDO == null) {
             throw new ClientException(USER_NULL);
         }
-//        Boolean hasLogin = stringRedisTemplate.hasKey("login_" + userLoginReqDTO.getUsername());
-//        if (hasLogin != null && hasLogin) {
-//            throw new ClientException(USER_IS_LOGIN);
-//        }
 
         Map<Object, Object> hasLoginMap = stringRedisTemplate.opsForHash().entries(USER_LOGIN_KEY + userLoginReqDTO.getUsername());
         if (CollUtil.isNotEmpty(hasLoginMap)) {
+            stringRedisTemplate.expire(USER_LOGIN_KEY + userLoginReqDTO.getUsername(), 30L, TimeUnit.MINUTES);
             String token = hasLoginMap.keySet().stream()
                     .findFirst()
                     .map(Object::toString)
